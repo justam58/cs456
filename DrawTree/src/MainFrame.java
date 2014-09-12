@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -55,6 +56,8 @@ public class MainFrame extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 	        if (e.getSource() == openMenuItem) {
 	        	JFileChooser chooser = new JFileChooser();
+	        	FileNameExtensionFilter drawfilter = new FileNameExtensionFilter("files in SON format", "draw");
+	            chooser.setFileFilter(drawfilter);
 	        	chooser.showOpenDialog(MainFrame.this);
 	        	// TODO only shows .draw files. 
 	        	// A .draw file is in SON format and contains only objects that implement Drawable (see below). 
