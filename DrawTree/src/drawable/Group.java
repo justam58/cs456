@@ -1,9 +1,6 @@
 package drawable;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import spark.data.SA;
@@ -20,39 +17,45 @@ public class Group extends SOReflect implements Drawable {
 	public double tx = 0;
 	public double ty = 0;
 	
+	public Transformation t;
+	
 	@Override
-	public void setStyle(SO style){
-		sx = style.getDouble("sx");
-		sy = style.getDouble("sy");
-		rotate = style.getDouble("rotate");
-		tx = style.getDouble("tx");
-		ty = style.getDouble("ty");
+	public void setStyle(SO style, Transformation t){
+		sx *= t.sx;
+		sy *= t.sy;
+		rotate += t.rotate;
+		tx += t.tx;
+		ty += t.ty;
+		Transformation newT = new Transformation(sx, sy, tx, ty, rotate);
 		SA contentsArray = style.getArray("contents");
 		for(int i = 0; i < contentsArray.size(); i++){
 			SO shapeObj = contentsArray.getSO(i);
 			Drawable shape = (Drawable)shapeObj;
-			shape.setStyle(shapeObj);
+			shape.setStyle(shapeObj, newT);
 			contents.add(shape);
 		}
 	}
 
 	@Override
 	public void paint(Graphics g) {
-		Graphics2D g2d = (Graphics2D)g;
+//		Graphics2D g2d = (Graphics2D)g;
 		for(int i = 0; i < contents.size(); i++){
-			AffineTransform atf = g2d.getTransform();
-			g2d.translate(tx, ty);
-			g2d.rotate(-Math.toRadians(rotate));
-			g2d.scale(sx, sy);
-			contents.get(i).paint(g);
-			g2d.setTransform(atf);
+			Drawable d = contents.get(i);
+//			Point2D center = new Point2D.Double(0,0);
+//			if(d instanceof Shape){
+//				center = ((Shape)d).getCenter();	
+//			}
+//			System.out.println(center.toString());
+//			AffineTransform atf = g2d.getTransform();
+//			g2d.translate(tx, ty);
+//			g2d.translate(center.getX(), center.getY());
+//			g2d.rotate(-Math.toRadians(rotate));
+//			g2d.scale(sx, sy);
+//			g2d.translate(-center.getX(), -center.getY());	
+			
+			d.paint(g);
+//			g2d.setTransform(atf);
 		}
-	}
-
-	@Override
-	public Point2D getCenter() {
-		// TODO What?
-		return null;
 	}
 
 }

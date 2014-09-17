@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import drawable.Drawable;
+import drawable.Transformation;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
@@ -75,7 +76,7 @@ public class MainFrame extends JFrame{
 //					sv.outSON();
 					SO style = sv.getSO();
 					Drawable shape = (Drawable)style;
-					shape.setStyle(style);
+					shape.setStyle(style, new Transformation());
 					contentPanel.add(shape);
 				} catch (FileNotFoundException e1) {
 					// never gonna happen
