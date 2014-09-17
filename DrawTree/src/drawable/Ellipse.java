@@ -4,8 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
@@ -13,11 +11,11 @@ import spark.data.SOReflect;
 public class Ellipse extends SOReflect implements Drawable{
 	
 	// Ellipse{ left:0, top:100, width:10, height:10, thickness:2, border:{r:0,g:0,b:0}, fill:{r:0,g:0,b:128} } 
-	public double top = 0;
-	public double left = 0;
-	public double width = 10;
-	public double height = 10;
-	public double thickness = 1;
+	public double top;
+	public double left;
+	public double width;
+	public double height;
+	public double thickness;
 	public Color border; // If there is no border color then no border is drawn.
 	public Color fill; // If there is no fill color then the rectangle is not filled. 
 
@@ -54,6 +52,7 @@ public class Ellipse extends SOReflect implements Drawable{
 		}
 
         if(border == null && fill == null){
+        	g.setColor(Color.black);
             Graphics2D g2d = (Graphics2D)g;
             g2d.setStroke(new BasicStroke((int)thickness));
             g.drawOval((int)left, (int)top, (int)width, (int)height);

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import drawable.Drawable;
@@ -74,11 +75,16 @@ public class MainFrame extends JFrame{
                         SONReader reader = new SONReader(new String[]{"drawable"}, new FileInputStream(file));
                         SV sv = reader.read();
                         SO style = sv.getSO();
-                        Drawable shape = (Drawable) style;
-                        shape.setStyle(style);
-                        contentPanel.add(shape);
+                        Drawable root = (Drawable) style;
+                        root.setStyle(style);
+                        contentPanel.setRoot(root);
                     } catch (FileNotFoundException e1) {
                         // never gonna happen
+                    } catch (spark.data.io.json.JSONException e1){
+                    	JOptionPane.showMessageDialog(null,
+                    		    "There is a parsing error in the selected file.",
+                    		    "SON Parsing error",
+                    		    JOptionPane.ERROR_MESSAGE);
                     }
                 }
 	        }

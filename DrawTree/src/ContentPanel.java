@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -10,23 +9,24 @@ import drawable.Drawable;
 @SuppressWarnings("serial")
 public class ContentPanel extends JPanel {
 	
-	public ArrayList<Drawable> shapes = new ArrayList<Drawable>();
+	public Drawable root;
 	
-	public void add(Drawable shape){
-		shapes.add(shape);
-		this.repaint();
+	public void setRoot(Drawable root){
+		this.root = root;
+		repaint();
 	}
 	
 	public void clean(){
-		shapes = new ArrayList<Drawable>();
+		root = null;
+		repaint();
 	}
 	
 	@Override
 	public void paint(Graphics g){
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
-		for(int i = 0; i < shapes.size(); i++){
-			shapes.get(i).paint(g);
+		if(root != null){
+			root.paint(g);
 		}
 	}
 }

@@ -4,8 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 
 import spark.data.SA;
 import spark.data.SO;
@@ -16,7 +14,7 @@ public class Polygon extends SOReflect implements Drawable {
 	// Polygon{ points: [ {x:0,y:0}, . . .], thickness:1, border:{r:100,g:0,b:0}, fill:{r:255,g:255,b:255} }
 	public int[] xPoints;
 	public int[] yPoints;
-	public double thickness = 1;
+	public double thickness;
 	public Color border; // If there is no border color then no border is drawn.
 	public Color fill; // If there is no fill color then the rectangle is not filled.
 	
@@ -52,22 +50,24 @@ public class Polygon extends SOReflect implements Drawable {
 
 	@Override
 	public void paint(Graphics g) {
-		if(fill != null){
-			g.setColor(fill);
-			g.fillPolygon(xPoints, yPoints, xPoints.length);
+		if(xPoints != null && yPoints != null){
+			if(fill != null){
+				g.setColor(fill);
+				g.fillPolygon(xPoints, yPoints, xPoints.length);
+			}
+			if(border != null){
+				g.setColor(border);
+	            Graphics2D g2d = (Graphics2D)g;
+				g2d.setStroke(new BasicStroke((int)thickness));
+				g.drawPolygon(xPoints, yPoints, xPoints.length);
+			}
+	
+	        if(border == null && fill == null){
+	            g.setColor(Color.black);
+	            Graphics2D g2d = (Graphics2D)g;
+	            g2d.setStroke(new BasicStroke((int)thickness));
+	            g.drawPolygon(xPoints, yPoints, xPoints.length);
+	        }
 		}
-		if(border != null){
-			g.setColor(border);
-            Graphics2D g2d = (Graphics2D)g;
-			g2d.setStroke(new BasicStroke((int)thickness));
-			g.drawPolygon(xPoints, yPoints, xPoints.length);
-		}
-
-        if(border == null && fill == null){
-            g.setColor(Color.black);
-            Graphics2D g2d = (Graphics2D)g;
-            g2d.setStroke(new BasicStroke((int)thickness));
-            g.drawPolygon(xPoints, yPoints, xPoints.length);
-        }
 	}
 }

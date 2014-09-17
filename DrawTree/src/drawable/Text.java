@@ -3,9 +3,6 @@ package drawable;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
@@ -13,11 +10,11 @@ import spark.data.SOReflect;
 public class Text extends SOReflect implements Drawable {
 	
 	// Text{ text:"Draw This", x:10,y:100, font:"Times", size:10 }
-	public String text = "Text";
-	public double x = 10;
-	public double y = 10;
-	public String font = "Times"; // this should also support the names "serif" and "sans-serif" to select the corresponding standard fonts.
-	public double size = 10;
+	public String text = "";
+	public double x;
+	public double y;
+	public String font = ""; // this should also support the names "serif" and "sans-serif" to select the corresponding standard fonts.
+	public double size;
 
 	@Override
 	public void setStyle(SO style) {

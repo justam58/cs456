@@ -14,9 +14,9 @@ public class Group extends SOReflect implements Drawable {
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
 	public double sx = 1;
 	public double sy = 1;
-	public double rotate = 0; // in degrees counter clockwise.
-	public double tx = 0;
-	public double ty = 0;
+	public double rotate; // in degrees counter clockwise.
+	public double tx;
+	public double ty;
 	
 	@Override
 	public void setStyle(SO style){
