@@ -53,7 +53,8 @@ public class Polygon extends SOReflect implements Drawable {
 			g.setColor(fill);
 			g.fillPolygon(xPoints, yPoints, xPoints.length);
 		}
-		else{
+		if(border != null){
+			g.setColor(border);
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setStroke(new BasicStroke(thickness));
 			g.drawPolygon(xPoints, yPoints, xPoints.length);

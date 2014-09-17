@@ -1,5 +1,6 @@
 package drawable;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -26,6 +27,7 @@ public class Text extends SOReflect implements Drawable {
 
 	@Override
 	public void paint(Graphics g) {
+		g.setColor(Color.black);
 		g.setFont(new Font(font,Font.PLAIN,size));
 		g.drawChars(text.toCharArray(), 0, text.length(), x, y);
 	}

@@ -52,7 +52,8 @@ public class Ellipse extends SOReflect implements Drawable {
 			g.setColor(fill);
 			g.fillOval(left, top, width, height);
 		}
-		else{
+		if(border != null){
+			g.setColor(border);
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setStroke(new BasicStroke(thickness));
 			g.drawOval(left, top, width, height);
