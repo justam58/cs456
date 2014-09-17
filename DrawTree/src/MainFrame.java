@@ -3,6 +3,9 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -10,6 +13,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import drawable.Drawable;
+import spark.data.SO;
+import spark.data.SV;
+import spark.data.io.SONReader;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -32,7 +40,7 @@ public class MainFrame extends JFrame{
     			    (int) ((bounds.height / 2) - (size.getHeight() / 2)));  
     	// create
         createComponents();
-        createMenuBar();
+        createMenuBar(); 
 
         pack();
     }
@@ -59,9 +67,19 @@ public class MainFrame extends JFrame{
 	        	FileNameExtensionFilter drawfilter = new FileNameExtensionFilter("files in SON format", "draw");
 	            chooser.setFileFilter(drawfilter);
 	        	chooser.showOpenDialog(MainFrame.this);
-	        	// TODO only shows .draw files. 
-	        	// A .draw file is in SON format and contains only objects that implement Drawable (see below). 
-	        	// You can read such files using the spark.io.SONReader class.
+	        	File file = chooser.getSelectedFile();
+				try {
+					contentPanel.clean();
+					SONReader reader = new SONReader(new String[]{"drawable"}, new FileInputStream(file));
+					SV sv = reader.read();
+//					sv.outSON();
+					SO style = sv.getSO();
+					Drawable shape = (Drawable)style;
+					shape.setStyle(style);
+					contentPanel.add(shape);
+				} catch (FileNotFoundException e1) {
+					// never gonna happen
+				}
 	        }
 	    }
     };
