@@ -15,7 +15,6 @@ import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import drawable.Drawable;
-import drawable.Transformation;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
@@ -65,22 +64,23 @@ public class MainFrame extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 	        if (e.getSource() == openMenuItem) {
 	        	JFileChooser chooser = new JFileChooser();
-	        	FileNameExtensionFilter drawfilter = new FileNameExtensionFilter("files in SON format", "draw");
+	        	FileNameExtensionFilter drawfilter = new FileNameExtensionFilter("DRAW file (.draw)", "draw");
 	            chooser.setFileFilter(drawfilter);
 	        	chooser.showOpenDialog(MainFrame.this);
 	        	File file = chooser.getSelectedFile();
-				try {
-					contentPanel.clean();
-					SONReader reader = new SONReader(new String[]{"drawable"}, new FileInputStream(file));
-					SV sv = reader.read();
-//					sv.outSON();
-					SO style = sv.getSO();
-					Drawable shape = (Drawable)style;
-					shape.setStyle(style, new Transformation());
-					contentPanel.add(shape);
-				} catch (FileNotFoundException e1) {
-					// never gonna happen
-				}
+                if (file != null) {
+                    try {
+                        contentPanel.clean();
+                        SONReader reader = new SONReader(new String[]{"drawable"}, new FileInputStream(file));
+                        SV sv = reader.read();
+                        SO style = sv.getSO();
+                        Drawable shape = (Drawable) style;
+                        shape.setStyle(style);
+                        contentPanel.add(shape);
+                    } catch (FileNotFoundException e1) {
+                        // never gonna happen
+                    }
+                }
 	        }
 	    }
     };
