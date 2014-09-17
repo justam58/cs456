@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
@@ -56,6 +57,11 @@ public class Rect extends SOReflect implements Drawable {
 			g2d.setStroke(new BasicStroke(thickness));
 			g.drawRect(left, top, width, height);
 		}
+	}
+
+	@Override
+	public Point2D getCenter() {
+		return new Point2D.Double(width/2,height/2);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
@@ -39,6 +40,13 @@ public class Line extends SOReflect implements Drawable{
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.setStroke(new BasicStroke(thickness));
 		g.drawLine(x1, y1, x2, y2);
+	}
+
+	@Override
+	public Point2D getCenter() {
+		double xTotal = x1 + x2;
+		double yTotal = y1 + y2;
+		return new Point2D.Double(xTotal/2, yTotal/2);
 	}
 
 }

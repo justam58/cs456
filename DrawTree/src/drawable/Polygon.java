@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 
 import spark.data.SA;
 import spark.data.SO;
@@ -59,6 +60,18 @@ public class Polygon extends SOReflect implements Drawable {
 			g2d.setStroke(new BasicStroke(thickness));
 			g.drawPolygon(xPoints, yPoints, xPoints.length);
 		}
+	}
+
+	@Override
+	public Point2D getCenter() {
+		double xTotal = 0;
+		double yTotal = 0;
+		int size = xPoints.length;
+		for(int i = 0; i < 3; i++){
+			xTotal += xPoints[i];
+			yTotal += yPoints[i];
+		}
+		return new java.awt.geom.Point2D.Double(xTotal/size, yTotal/size);
 	}
 
 }

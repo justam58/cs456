@@ -3,6 +3,7 @@ package drawable;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
@@ -30,6 +31,12 @@ public class Text extends SOReflect implements Drawable {
 		g.setColor(Color.black);
 		g.setFont(new Font(font,Font.PLAIN,size));
 		g.drawChars(text.toCharArray(), 0, text.length(), x, y);
+	}
+
+	@Override
+	public Point2D getCenter() {
+		// TODO What?
+		return null;
 	}
 
 }

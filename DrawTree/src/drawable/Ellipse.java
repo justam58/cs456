@@ -4,11 +4,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import spark.data.SO;
 import spark.data.SOReflect;
-import spark.data.SV;
 
 public class Ellipse extends SOReflect implements Drawable {
 	
@@ -58,6 +57,11 @@ public class Ellipse extends SOReflect implements Drawable {
 			g2d.setStroke(new BasicStroke(thickness));
 			g.drawOval(left, top, width, height);
 		}
+	}
+
+	@Override
+	public Point2D getCenter() {
+		return new Point2D.Double(width/2,height/2);
 	}
 
 }
