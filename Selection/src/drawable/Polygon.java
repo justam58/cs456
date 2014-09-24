@@ -4,15 +4,12 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 
-public class Polygon extends SOReflect implements Drawable, Selectable  {
+public class Polygon extends SOReflect implements Drawable {
 	
 	// Polygon{ points: [ {x:0,y:0}, . . .], thickness:1, border:{r:100,g:0,b:0}, fill:{r:255,g:255,b:255} }
 	public int[] xPoints;
@@ -74,16 +71,4 @@ public class Polygon extends SOReflect implements Drawable, Selectable  {
 		}
 	}
 
-	@Override
-	public ArrayList<Integer> select(double x, double y, int myIndex,
-			AffineTransform transform) {
-		// not needed for this project
-		return null;
-	}
-
-	@Override
-	public ArrayList<Point2D> controls() {
-		// not needed for this project
-		return null;
-	}
 }

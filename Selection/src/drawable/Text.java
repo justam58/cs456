@@ -40,8 +40,9 @@ public class Text extends SOReflect implements Drawable, Selectable  {
 
 	@Override
 	public ArrayList<Point2D> controls() {
-		// TODO 
 		// returns only the left end of its baseline as the control point.
-		return null;
+		ArrayList<Point2D> result = new ArrayList<Point2D>();
+		result.add(new Point2D.Double(x,y));
+		return result;
 	}
 }

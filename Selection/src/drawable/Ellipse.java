@@ -71,8 +71,12 @@ public class Ellipse extends SOReflect implements Drawable, Selectable {
 
 	@Override
 	public ArrayList<Point2D> controls() {
-		// TODO 
-		// same as Rect
-		return null;
+		// same as Rect (returns its four corners)
+		ArrayList<Point2D> result = new ArrayList<Point2D>();
+		result.add(new Point2D.Double(left,top)); // top left point
+		result.add(new Point2D.Double(left+(width/2),top)); // top right point
+		result.add(new Point2D.Double(left+(width/2),top+(height/2))); // down right point
+		result.add(new Point2D.Double(left,top+(height/2))); // down left point
+		return result;
 	}
 }

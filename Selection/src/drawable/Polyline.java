@@ -61,8 +61,11 @@ public class Polyline extends SOReflect implements Drawable, Selectable {
 
 	@Override
 	public ArrayList<Point2D> controls() {
-		// TODO
 		// returns its points as the control points.
-		return null;
+		ArrayList<Point2D> result = new ArrayList<Point2D>();
+        for (int i = 0; i < xPoints.length; i++) {
+        	result.add(new Point2D.Double(xPoints[i],yPoints[i]));
+        }
+		return result;
 	}
 }

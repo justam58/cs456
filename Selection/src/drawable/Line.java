@@ -50,8 +50,10 @@ public class Line extends SOReflect implements Drawable, Selectable  {
 
 	@Override
 	public ArrayList<Point2D> controls() {
-		// TODO 
 		// returns its two end points.
-		return null;
+		ArrayList<Point2D> result = new ArrayList<Point2D>();
+		result.add(new Point2D.Double(x1,y1));
+		result.add(new Point2D.Double(x2,y2));
+		return result;
 	}
 }
