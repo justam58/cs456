@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
@@ -20,6 +21,8 @@ public class Line extends SOReflect implements Drawable, Selectable  {
 	public double y2;
 	public double thickness;
 	public Color color = Color.black;
+	
+	private static final int HIT_BOX_SIZE = 3;
 
 	@Override
 	public void setStyle(SO style){
@@ -42,10 +45,30 @@ public class Line extends SOReflect implements Drawable, Selectable  {
 
 	@Override
 	public ArrayList<Integer> select(double x, double y, int myIndex, AffineTransform transform) {
-		// TODO 
+		Point2D ptSrc = new Point2D.Double(x,y);
+		Point2D ptDst = transform.transform(ptSrc, null);
+		x = ptDst.getX();
+		y = ptDst.getY();
+		
+		int HIT_BOX_SIZE_X = (int) (HIT_BOX_SIZE / transform.getScaleX());
+		int HIT_BOX_SIZE_Y = (int) (HIT_BOX_SIZE / transform.getScaleY());
+		
 		// This will select if the selection point is within three pixels of the line on either side.
 		// It returns an array containing only the myIndex parameter if selected, null otherwise.
-		return null;
+		ArrayList<Integer> result = null;
+		
+		int boxX = (int) (x - HIT_BOX_SIZE_X / 2);
+		int boxY = (int) (y - HIT_BOX_SIZE_Y / 2);
+		
+		int width = HIT_BOX_SIZE_X;
+		int height = HIT_BOX_SIZE_Y;
+
+		Line2D line = new Line2D.Double(x1, y1, x2, y2);
+		if (line.intersects(boxX, boxY, width, height)) {
+			result = new ArrayList<Integer>();
+			result.add(myIndex);
+		}		
+		return result;
 	}
 
 	@Override

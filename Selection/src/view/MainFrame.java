@@ -1,3 +1,4 @@
+package view;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
@@ -47,7 +48,7 @@ public class MainFrame extends JFrame{
     }
     
     private void createComponents() {        
-        contentPanel = new ContentPanel();
+        contentPanel = ContentPanel.getInstance();
         this.add(contentPanel);
     }
     
@@ -67,9 +68,9 @@ public class MainFrame extends JFrame{
 	        	JFileChooser chooser = new JFileChooser();
 	        	FileNameExtensionFilter drawfilter = new FileNameExtensionFilter("DRAW file (.draw)", "draw");
 	            chooser.setFileFilter(drawfilter);
-	        	chooser.showOpenDialog(MainFrame.this);
+	        	int returnVal = chooser.showOpenDialog(MainFrame.this);
 	        	File file = chooser.getSelectedFile();
-                if (file != null) {
+                if (file != null && returnVal == JFileChooser.APPROVE_OPTION) {
                     try {
                         contentPanel.clean();
                         SONReader reader = new SONReader(new String[]{"drawable"}, new FileInputStream(file));

@@ -21,6 +21,8 @@ public class Ellipse extends SOReflect implements Drawable, Selectable {
 	public double thickness;
 	public Color border; // If there is no border color then no border is drawn.
 	public Color fill; // If there is no fill color then the rectangle is not filled. 
+	
+	private static final int HIT_BOX_SIZE = 3;
 
 	@Override
 	public void setStyle(SO style) {
@@ -64,9 +66,33 @@ public class Ellipse extends SOReflect implements Drawable, Selectable {
 
 	@Override
 	public ArrayList<Integer> select(double x, double y, int myIndex, AffineTransform transform) {
-		// TODO
-		// same as Rect except that selection is based on the equation of the ellipse rather than the rectangle.
-		return null;
+		Point2D ptSrc = new Point2D.Double(x,y);
+		Point2D ptDst = transform.transform(ptSrc, null);
+		x = ptDst.getX();
+		y = ptDst.getY();
+		
+		int HIT_BOX_SIZE_X = (int) (HIT_BOX_SIZE / transform.getScaleX());
+		int HIT_BOX_SIZE_Y = (int) (HIT_BOX_SIZE / transform.getScaleY());
+		
+		ArrayList<Integer> result = null;
+		// If the ellipse is filled, then it is selected if the selection point is inside the ellipse
+		x -= left;
+		y -= top;
+		if(fill != null){
+			if(Math.pow((x-(width/2))/(width/2.0), 2) + Math.pow((y-(height/2))/(height/2.0), 2) <= 1){
+				result = new ArrayList<Integer>();
+				result.add(myIndex);
+			}
+		}
+		else // If it is not filled then the selection point must be within 3 pixels of one of the edges.
+		{
+			if(Math.pow((x-(width/2))/((width/2.0)+HIT_BOX_SIZE_X), 2) + Math.pow((y-(height/2))/((height/2.0)+HIT_BOX_SIZE_Y), 2) <= 1 &&
+			   Math.pow((x-(width/2))/((width/2.0)-HIT_BOX_SIZE_X), 2) + Math.pow((y-(height/2))/((height/2.0)-HIT_BOX_SIZE_Y), 2) > 1){
+				result = new ArrayList<Integer>();
+				result.add(myIndex);
+			}
+		}
+		return result;
 	}
 
 	@Override
@@ -74,9 +100,9 @@ public class Ellipse extends SOReflect implements Drawable, Selectable {
 		// same as Rect (returns its four corners)
 		ArrayList<Point2D> result = new ArrayList<Point2D>();
 		result.add(new Point2D.Double(left,top)); // top left point
-		result.add(new Point2D.Double(left+(width/2),top)); // top right point
-		result.add(new Point2D.Double(left+(width/2),top+(height/2))); // down right point
-		result.add(new Point2D.Double(left,top+(height/2))); // down left point
+		result.add(new Point2D.Double(left+width,top)); // top right point
+		result.add(new Point2D.Double(left+width,top+height)); // down right point
+		result.add(new Point2D.Double(left,top+height)); // down left point
 		return result;
 	}
 }

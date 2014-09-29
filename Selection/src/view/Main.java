@@ -1,3 +1,4 @@
+package view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -13,7 +14,6 @@ public class Main {
 					window.setVisible(true);
 				}
 			}
-			
 		);
 	}
 
