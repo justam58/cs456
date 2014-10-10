@@ -1,0 +1,5 @@
+Group{ contents: [
+		Ellipse{ left:300, top:0, width:50, height:100, thickness:2, border:{r:255,g:0,b:0}, fill:{r:0,g:255,b:0} }
+		], 
+	rotate: 90.0, sx:0.5, sy:0.5, tx:0, ty:300
+}
