@@ -154,4 +154,60 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void changeBackgroundColor(Color c) {
+		fill = c;
+	}
+
+	@Override
+	public void changeLabel(String label) {
+		// do nothing
+	}
+	
+	@Override
+	public double move(double dx, double dy, Interactable range) {
+		if(dx == 0){
+			top += dy;
+			if(range instanceof Rect){
+				Rect rangeRect = (Rect)range;
+				if(top < rangeRect.top){
+					top = rangeRect.top;
+				}
+				if((top+height) > (rangeRect.top+rangeRect.height)){
+					top = rangeRect.top+rangeRect.height-height;
+				}
+			}
+			if(range instanceof Line){
+				Line rangeLine = (Line)range;
+				double yTop = Math.min(rangeLine.y1, rangeLine.y2);
+				double yBot = Math.max(rangeLine.y1, rangeLine.y2);
+				if(top < yTop){
+					top = yTop;
+				}
+				if((top+height) > yBot){
+					top = yBot-height;
+				}
+			}
+			return top;
+		}
+		else{// dy ==0
+			return left;
+		}
+	}
+	
+	@Override
+	public double getSliderHeight() {
+		return height;
+	}
+	
+	@Override
+	public void moveTo(double x, double y) {
+		if(x != -1){
+			left = x;
+		}
+		if(y != -1){
+			top = y;
+		}
+	}
 }

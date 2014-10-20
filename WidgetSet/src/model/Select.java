@@ -15,7 +15,7 @@ import view.ContentPanel;
 public class Select extends Group implements Drawable, Selectable {
 	
 	public ArrayList<ArrayList<Integer>> selected = new ArrayList<ArrayList<Integer>>();
-	
+
 	@Override
 	public void paint(Graphics g) {
 		// first draw all of its contents using the paint() method from group 
@@ -61,7 +61,7 @@ public class Select extends Group implements Drawable, Selectable {
 			if(content instanceof Selectable){
 				// Be sure to correctly account for the transformation by transforming the selection point by the inverse of the transformation on this group and by pass
 				// That will bring the selection point into the coordinate system of the group contents
-				AffineTransform atf = new AffineTransform();
+				AffineTransform atf = new AffineTransform(transform);
 				atf.scale(1/sx, 1/sy);
 				atf.rotate(Math.toRadians(rotate));
 				atf.translate(-tx, -ty);
@@ -72,18 +72,23 @@ public class Select extends Group implements Drawable, Selectable {
 				// but should also store the path returned by its child selection in its "selected" attribute
 				// If its selected attribute changes
 				// it should also call repaint() to make certain the control points are correctly updated on the screen using the paint method.
+				
 				if(!equalsTo(selected.get(i),(selectPath))){
 					selected.set(i, selectPath);
 					ContentPanel.getInstance().repaint();
 				}
-//				if(selectPath != null){
-//					selectPath.add(0, myIndex);
-//					System.out.println(myIndex);
-//					System.out.println(selectPath);
-////					return selectPath;
-//				}
+				if(selectPath != null){
+					selectPath.add(0, myIndex);
+//					return selectPath;
+				}
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public ArrayList<Point2D> controls() {
+		// This object has no controls of its own.
 		return null;
 	}
 	
@@ -106,8 +111,9 @@ public class Select extends Group implements Drawable, Selectable {
 	}
 	
 	private void drawControls(Graphics2D g, ArrayList<Point2D> controlPoints){
-		int pointSizeX = (int)(4/sx);
-		int pointSizeY = (int)(4/sy);
+		AffineTransform atf = g.getTransform();
+		int pointSizeX = (int)(4/atf.getScaleX());
+		int pointSizeY = (int)(4/atf.getScaleY());
 		for(int j = 0; j < controlPoints.size(); j++){
 			Point2D p = controlPoints.get(j);
 			g.setColor(Color.white);
@@ -117,5 +123,4 @@ public class Select extends Group implements Drawable, Selectable {
 			g.drawRect((int)p.getX()-pointSizeX, (int)p.getY()-pointSizeY, pointSizeX*2, pointSizeY*2);
 		}
 	}
-
 }

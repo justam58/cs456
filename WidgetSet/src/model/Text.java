@@ -25,11 +25,13 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public String font = ""; // this should also support the names "serif" and "sans-serif" to select the corresponding standard fonts.
 	public double size;
 	
+	public boolean edit;
+	public double cursor;
+	
 	public Rectangle boundingBox = null;
 
 	@Override
 	public void setStyle(SO style) {
-
 	}
 
 	@Override
@@ -109,4 +111,30 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void changeBackgroundColor(Color c) {
+		// do nothing
+	}
+	
+	@Override
+	public void changeLabel(String label) {
+		text = label;
+	}
+	
+	@Override
+	public double move(double dx, double dy, Interactable range) {
+		return 0;
+	}
+	
+	@Override
+	public double getSliderHeight() {
+		return 0;
+	}
+	
+	@Override
+	public void moveTo(double x, double y) {
+		// do nothing
+	}
+
 }
