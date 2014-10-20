@@ -1,6 +1,10 @@
 package view;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -33,6 +37,8 @@ public class ContentPanel extends JPanel {
 		this.root = root;
 		this.addMouseListener(mouseListener);
 		this.addMouseMotionListener(mouseMotionListner);
+		this.addKeyListener(keyListener);
+		this.addFocusListener(focusListener);
 		repaint();
 	}
 	
@@ -40,6 +46,8 @@ public class ContentPanel extends JPanel {
 		this.root = null;
 		this.removeMouseListener(mouseListener);
 		this.removeMouseMotionListener(mouseMotionListner);
+		this.removeKeyListener(keyListener);
+		this.removeFocusListener(focusListener);
 		painted = false;
 		repaint();
 	}
@@ -63,7 +71,7 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-//			System.out.println("Select (" + e.getX() + ", " + e.getY() + ")");
+//			System.out.println("mousePressed (" + e.getX() + ", " + e.getY() + ")");
 			Point2D p = new Point2D.Double(e.getX(),e.getY());
 			root.mouseDown(p.getX(), p.getY(), new AffineTransform());
 		}
@@ -86,13 +94,46 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-//			System.out.println("Select (" + e.getX() + ", " + e.getY() + ")");
+//			System.out.println("mouseMoved (" + e.getX() + ", " + e.getY() + ")");
 			if(painted){
 				Point2D p = new Point2D.Double(e.getX(),e.getY());
 				root.mouseMove(p.getX(), p.getY(), new AffineTransform());
 			}
 		}
     	
+    };
+    
+    private KeyListener keyListener = new KeyListener(){
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			System.out.println("keyTyped");
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			System.out.println("keyPressed");
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			System.out.println("keyReleased");
+		}
+    	
+    };
+    
+    private FocusListener focusListener = new FocusListener(){
+
+		@Override
+		public void focusGained(FocusEvent e) {
+			System.out.println("focusGained");
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			System.out.println("focusLost");
+		}
+
     };
 	
 	@Override

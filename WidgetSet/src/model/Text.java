@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.TextField;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -15,6 +16,7 @@ import able.Interactable;
 import able.Selectable;
 import spark.data.SO;
 import spark.data.SOReflect;
+import spark.data.SParented;
 
 public class Text extends SOReflect implements Drawable, Selectable, Interactable {
 	
@@ -28,7 +30,10 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public boolean edit;
 	public double cursor;
 	
+	private boolean editing = false;
+	
 	public Rectangle boundingBox = null;
+	public TextField textField;
 
 	@Override
 	public void setStyle(SO style) {
@@ -38,8 +43,18 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public void paint(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(new Font(font,Font.PLAIN,(int)size));
-		g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
+		if(editing){
+			text.replace("|", "");
+			text = text.substring(0, (int)cursor) + text.substring((int)cursor);
+			System.out.println(text);
+			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
+		}
+		else
+		{
+			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
+		}
 		setBoundingBox((Graphics2D)g);
+
 //		g.drawRect((int)boundingBox.getX(), (int)boundingBox.getY(), (int)boundingBox.getWidth(), (int)boundingBox.getHeight());
 	}
 
@@ -84,32 +99,47 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
+		// If edit=true and select() is called and succeeds, 
+		// then the cursor attribute is set to the character position where typing insertions should occur. 
+		// When cursor is set to any number greater than or equal to zero, 
+		// the cursor is painted at the insertion point and the Root object has its key focus set to this object.
+		if(edit){
+			ArrayList<Integer> selectedPath = select(x,y,0,myTransform);
+			if(selectedPath != null){
+				Root root = getPanel();
+				root.setKeyFocus(this);
+				editing = true;
+				return true;
+			}
+			editing = false;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean key(char key) {
-		// TODO Auto-generated method stub
+		System.out.println("text got key!");
 		return false;
 	}
 
 	@Override
 	public Root getPanel() {
-		// TODO Auto-generated method stub
-		return null;
+		SParented parent = myParent(); 
+		while(!(parent instanceof Interactable)){
+			parent = parent.myParent();
+		}
+		Interactable InteractableParent = (Interactable)parent;
+		return InteractableParent.getPanel();
 	}
 
 	@Override

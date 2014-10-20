@@ -60,7 +60,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 		if(clicked && state.equals("idle")){
 			state = "active";
 		}
-		getPanel();
+		getPanel().repaint();
 	}
 	
 	private double valueToModel(double v, double sliderHeight){
@@ -241,7 +241,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
 		dragging = false;
-		Root root = getPanel();
 		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable content = (Selectable)contents.get(i);
@@ -250,6 +249,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 					updateState(false, true);
 					SOReflect shape = (SOReflect)content;
 					String classVal = shape.getString("class");
+					Root root = getPanel();
 					if(classVal != null && classVal.equals("up") && models.size() > 0){
 						String value = root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)+step;

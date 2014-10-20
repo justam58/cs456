@@ -24,20 +24,24 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	public double tx;
 	public double ty;
 	
+	public Interactable focus = null;
+	
 	public TreeNode model = new TreeNode("","");
 	
 	public void setKeyFocus(Interactable focus){
-		// TODO
 		// When this method is called on a Root object 
 		// it saves the pointer to the focus object
 		// but not as a SPARK attribute. 
-		// Whenever the Root receives a key() event 
-		// it will call key() on the focus object if there is one.
+		this.focus = focus;
 	}
 	
 	public void releaseKeyFocus(){
-		// TODO
 		// Sets the key focus to null.
+		this.focus = null;
+	}
+	
+	public void repaint(){
+		contentPanel.repaint();
 	}
 	
 	private AffineTransform getTransform(){
@@ -133,13 +137,18 @@ public class Root extends SOReflect implements Drawable, Interactable {
 
 	@Override
 	public boolean key(char key) {
-		// TODO Auto-generated method stub
+		// Whenever the Root receives a key() event 
+		// it will call key() on the focus object if there is one.
+		if(focus != null){
+			System.out.println("pass key");
+			focus.key(key);
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public Root getPanel() {
-		contentPanel.repaint();
 		return this;
 	}
 	
