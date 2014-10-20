@@ -112,4 +112,29 @@ public class Line extends SOReflect implements Drawable, Selectable, Interactabl
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void changeBackgroundColor(Color c) {
+		// do nothing
+	}
+
+	@Override
+	public void changeLabel(String label) {
+		// do nothing
+	}
+	
+	@Override
+	public double move(double dx, double dy, Interactable range) {
+		return 0;
+	}
+	
+	@Override
+	public double getSliderHeight() {
+		return 0;
+	}
+	
+	@Override
+	public void moveTo(double x, double y) {
+		// do nothing
+	}
 }

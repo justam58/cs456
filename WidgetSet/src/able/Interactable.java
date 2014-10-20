@@ -1,5 +1,6 @@
 package able;
 
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
 
 import model.Root;
@@ -20,5 +21,15 @@ public interface Interactable {
 	
 	// If the object is Root then it returns itself. Otherwise this method is called on the parent().
 	public Root getPanel();
+	
+	public void changeBackgroundColor(Color c);
+	
+	public void changeLabel(String label);
+	
+	public double move(double dx, double dy, Interactable ranger);
+	
+	public double getSliderHeight();
+	
+	public void moveTo(double x, double y);
 
 }

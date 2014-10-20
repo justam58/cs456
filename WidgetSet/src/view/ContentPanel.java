@@ -3,13 +3,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
 import javax.swing.JPanel;
 
 import model.Root;
-import able.*;
 
 @SuppressWarnings("serial")
 public class ContentPanel extends JPanel {
@@ -21,21 +21,26 @@ public class ContentPanel extends JPanel {
         return instance;
     }
 	
-	public Root root = new Root();
+	public Root root = null;
+	
+	private boolean painted = false;
 	
 	public ContentPanel (){
 		super();
 	}
 	
-	public void setRoot(Drawable root){
-		this.root.setRoot(root);;
+	public void setRoot(Root root){
+		this.root = root;
 		this.addMouseListener(mouseListener);
+		this.addMouseMotionListener(mouseMotionListner);
 		repaint();
 	}
 	
 	public void clean(){
-		this.root.clean();;
+		this.root = null;
 		this.removeMouseListener(mouseListener);
+		this.removeMouseMotionListener(mouseMotionListner);
+		painted = false;
 		repaint();
 	}
 	
@@ -43,20 +48,17 @@ public class ContentPanel extends JPanel {
     	
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
+			// do nothing
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
+			// do nothing
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
+			// do nothing
 		}
 
 		@Override
@@ -68,15 +70,38 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
+//			System.out.println("Select (" + e.getX() + ", " + e.getY() + ")");
+			Point2D p = new Point2D.Double(e.getX(),e.getY());
+			root.mouseUp(p.getX(), p.getY(), new AffineTransform());
 		}
+    };
+    
+    private MouseMotionListener mouseMotionListner = new MouseMotionListener(){
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			Point2D p = new Point2D.Double(e.getX(),e.getY());
+			root.mouseMove(p.getX(), p.getY(), new AffineTransform());
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+//			System.out.println("Select (" + e.getX() + ", " + e.getY() + ")");
+			if(painted){
+				Point2D p = new Point2D.Double(e.getX(),e.getY());
+				root.mouseMove(p.getX(), p.getY(), new AffineTransform());
+			}
+		}
+    	
     };
 	
 	@Override
 	public void paint(Graphics g){
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
-		root.paint(g);
+		if(root != null){
+			root.paint(g);
+			painted = true;
+		}
 	}
 }

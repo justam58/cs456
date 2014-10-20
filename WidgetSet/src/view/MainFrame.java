@@ -16,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import model.Root;
 import able.*;
 import spark.data.SO;
 import spark.data.SV;
@@ -76,14 +77,19 @@ public class MainFrame extends JFrame{
                         SONReader reader = new SONReader(new String[]{"model"}, new FileInputStream(file));
                         SV sv = reader.read();
                         SO style = sv.getSO();
-                        Drawable root = (Drawable) style;
+                        Root root = (Root) style;
                         root.setStyle(style);
                         contentPanel.setRoot(root);
                     } catch (FileNotFoundException e1) {
                         // never gonna happen
                     } catch (spark.data.io.json.JSONException e1){
                     	JOptionPane.showMessageDialog(null,
-                    		    "There is a parsing error in the selected file.",
+                    			e1,
+                    		    "SON Parsing error",
+                    		    JOptionPane.ERROR_MESSAGE);
+                    } catch (ClassCastException e1){
+                    	JOptionPane.showMessageDialog(null,
+                    		    "There should be a ROOT at the root level.",
                     		    "SON Parsing error",
                     		    JOptionPane.ERROR_MESSAGE);
                     }
