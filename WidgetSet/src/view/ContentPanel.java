@@ -1,8 +1,6 @@
 package view;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -38,7 +36,6 @@ public class ContentPanel extends JPanel {
 		this.addMouseListener(mouseListener);
 		this.addMouseMotionListener(mouseMotionListner);
 		this.addKeyListener(keyListener);
-		this.addFocusListener(focusListener);
 		repaint();
 	}
 	
@@ -47,7 +44,6 @@ public class ContentPanel extends JPanel {
 		this.removeMouseListener(mouseListener);
 		this.removeMouseMotionListener(mouseMotionListner);
 		this.removeKeyListener(keyListener);
-		this.removeFocusListener(focusListener);
 		painted = false;
 		repaint();
 	}
@@ -74,6 +70,7 @@ public class ContentPanel extends JPanel {
 //			System.out.println("mousePressed (" + e.getX() + ", " + e.getY() + ")");
 			Point2D p = new Point2D.Double(e.getX(),e.getY());
 			root.mouseDown(p.getX(), p.getY(), new AffineTransform());
+			requestFocusInWindow();
 		}
 
 		@Override
@@ -107,33 +104,19 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void keyTyped(KeyEvent e) {
-			System.out.println("keyTyped");
+			// do nothing
 		}
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			System.out.println("keyPressed");
+			root.key(e.getKeyChar());
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-			System.out.println("keyReleased");
+			// do nothing
 		}
     	
-    };
-    
-    private FocusListener focusListener = new FocusListener(){
-
-		@Override
-		public void focusGained(FocusEvent e) {
-			System.out.println("focusGained");
-		}
-
-		@Override
-		public void focusLost(FocusEvent e) {
-			System.out.println("focusLost");
-		}
-
     };
 	
 	@Override

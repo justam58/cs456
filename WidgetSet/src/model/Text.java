@@ -43,11 +43,12 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public void paint(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(new Font(font,Font.PLAIN,(int)size));
-		if(editing){
-			text.replace("|", "");
-			text = text.substring(0, (int)cursor) + text.substring((int)cursor);
-			System.out.println(text);
-			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
+		if(editing && cursor >= 0){
+			if(cursor > text.length()){
+				cursor = text.length();
+			}
+			String textWithCursor = text.substring(0, (int)cursor) + "|" + text.substring((int)cursor);
+			g.drawChars(textWithCursor.toCharArray(), 0, textWithCursor.length(), (int)x, (int)y);
 		}
 		else
 		{
@@ -108,6 +109,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 			if(selectedPath != null){
 				Root root = getPanel();
 				root.setKeyFocus(this);
+				root.repaint();
 				editing = true;
 				return true;
 			}
@@ -128,8 +130,16 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 
 	@Override
 	public boolean key(char key) {
-		System.out.println("text got key!");
-		return false;
+		if((int)key == 8 && cursor > 0){// back space
+			text = text.substring(0,(int)cursor-1) + text.substring((int)cursor);
+			cursor--;
+		}
+		else{
+			text = text.substring(0,(int)cursor) + key + text.substring((int)cursor);
+			cursor++;
+		}
+		getPanel().repaint();
+		return true;
 	}
 
 	@Override

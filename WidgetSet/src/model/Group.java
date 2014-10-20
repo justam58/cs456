@@ -134,7 +134,14 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 
 	@Override
 	public boolean key(char key) {
-		// TODO Auto-generated method stub
+		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
+			// recursively call select on its contents
+			Interactable content = (Interactable)contents.get(i);
+			boolean handeled = content.key(key);
+			if(handeled){
+				return true;
+			}
+		}
 		return false;
 	}
 

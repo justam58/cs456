@@ -106,6 +106,8 @@ public class Root extends SOReflect implements Drawable, Interactable {
 				return true;
 			}
 		}
+		releaseKeyFocus();
+		repaint();
 		return false;
 	}
 
@@ -140,7 +142,6 @@ public class Root extends SOReflect implements Drawable, Interactable {
 		// Whenever the Root receives a key() event 
 		// it will call key() on the focus object if there is one.
 		if(focus != null){
-			System.out.println("pass key");
 			focus.key(key);
 			return true;
 		}
