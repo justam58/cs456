@@ -58,7 +58,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		for(int i = 0; i < contents.size(); i++){
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable content = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
@@ -73,7 +73,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		for(int i = 0; i < contents.size(); i++){
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable shape = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
@@ -89,22 +89,23 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		for(int i = 0; i < contents.size(); i++){
+		Root root = getPanel();
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable shape = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
 				if(selectPath != null){
 					updateState(false, true);
+					if(state.equals("active") && models.size() > 0){
+						root.model = root.model.update(models, root.model, 0, String.valueOf(value));
+					}
+					state = "idle";
+					return true;
 				}
 			}
 		}
-		Root root = getPanel();
-		if(state.equals("active") && models.size() > 0){
-			root.model = root.model.update(models, root.model, 0, String.valueOf(value));
-		}
 		state = "idle";
-		root.model.print();
-		return true;
+		return false;
 	}
 	
 	@Override

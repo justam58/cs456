@@ -123,9 +123,11 @@ public class Root extends SOReflect implements Drawable, Interactable {
 			Interactable shape = (Interactable)contents.get(i);
 			boolean handled = shape.mouseUp(x,y,getTransform());
 			if(handled){
+				model.print();
 				return true;
 			}
 		}
+		model.print();
 		return false;
 	}
 

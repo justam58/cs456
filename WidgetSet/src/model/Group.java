@@ -126,6 +126,7 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 			Interactable content = (Interactable)contents.get(i);
 			boolean handeled = content.mouseUp(x, y, atf);
 			if(handeled){
+				System.out.println(contents.get(i));
 				return true;
 			}
 		}

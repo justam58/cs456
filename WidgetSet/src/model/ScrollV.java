@@ -184,7 +184,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		for(int i = 0; i < contents.size(); i++){
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable content = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = content.select(x, y, i, myTransform);
@@ -192,7 +192,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 					updateState(true, false);
 					SOReflect shape = (SOReflect)content;
 					String classVal = shape.getString("class");
-//					System.out.println(classVal);
 					if(classVal != null && classVal.equals("slide")){
 						dragging = true;
 						slider = i;
@@ -200,9 +199,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 						myTransform.transform(new Point2D.Double(x,y), endp);
 						d_dragStart = endp.getY();
 					}
-					if(classVal != null && !classVal.equals("active") && !classVal.equals("range")){
-						return true;
-					}
+					return true;
 				}
 			}
 		}
@@ -227,7 +224,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			updateState(true, false);
 			return true;
 		}
-		for(int i = 0; i < contents.size(); i++){
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable shape = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
@@ -245,7 +242,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
 		dragging = false;
 		Root root = getPanel();
-		for(int i = 0; i < contents.size(); i++){
+		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable content = (Selectable)contents.get(i);
 				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
@@ -273,12 +270,13 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 						Interactable sliderShape = (Interactable)contents.get(slider);
 						sliderShape.moveTo(-1, valueFromModel(newValue,sliderShape.getSliderHeight()));
 					}
+					state = "idle";
+					return true;
 				}
 			}
 		}
 		state = "idle";
-		root.model.print();
-		return true;
+		return false;
 	}
 
 	@Override

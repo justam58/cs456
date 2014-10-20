@@ -70,7 +70,7 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-//			System.out.println("Select (" + e.getX() + ", " + e.getY() + ")");
+//			System.out.println("mouseReleased (" + e.getX() + ", " + e.getY() + ")");
 			Point2D p = new Point2D.Double(e.getX(),e.getY());
 			root.mouseUp(p.getX(), p.getY(), new AffineTransform());
 		}
