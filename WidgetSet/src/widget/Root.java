@@ -11,6 +11,7 @@ import able.Interactable;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
+import spark.data.SV;
 import view.ContentPanel;
 
 public class Root extends SOReflect implements Drawable, Interactable {
@@ -54,8 +55,8 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public void setStyle(SO style){
-		SO modelObj = style.getObj("model");
-		model = buildTree(model, modelObj);
+		SV modelValue = style.get("model");
+		model = build(model,"model",modelValue);
 		model.print();
 		
 		SA contentsArray = style.getArray("contents");
@@ -67,18 +68,49 @@ public class Root extends SOReflect implements Drawable, Interactable {
 		}
 	}
 	
-	private TreeNode buildTree(TreeNode current, SO obj){
+	private TreeNode build(TreeNode current, String name, SV value){
+		if(value.isSO()){
+			SO obj = value.getSO();
+			current = buildObj(current,obj);
+		}
+		else if(value.isSA()){
+			SA array = value.getSA();
+			current = buildArray(current,array);
+		}
+		else if(value.isBoolean())
+		{
+			current = new TreeNode(name, String.valueOf(value.isTrue()));
+		}
+		else if(value.isString())
+		{
+			current = new TreeNode(name, String.valueOf(value.getString()));
+		}
+		else if(value.isLong())
+		{
+			current = new TreeNode(name, String.valueOf(value.getLong()));
+		}
+		else if(value.isDouble())
+		{
+			current = new TreeNode(name, String.valueOf(value.getDouble()));
+		}
+		return current;
+	}
+	
+	private TreeNode buildObj(TreeNode current, SO obj){
 		String[] attributes = obj.attributes();
 		for(int i = 0; i < attributes.length; i++){
 			String attr = attributes[i];
-			TreeNode kid = null;
-			try{
-				SO valObj = obj.getObj(attr);
-				kid = buildTree(new TreeNode(attr,""), valObj);
-			} catch(java.lang.RuntimeException e){
-				String val = obj.get(attr).toString();
-				kid = new TreeNode(attr,val);
-			}
+			SV value = obj.get(attr);
+			TreeNode kid = build(new TreeNode(attr,""),attr,value);
+			current.kids.add(kid);
+		}
+		return current;
+	}
+	
+	private TreeNode buildArray(TreeNode current, SA array) {
+		for(int i = 0; i < array.size(); i++){
+			SV value = array.get(i);
+			TreeNode kid = build(new TreeNode("",""),"array",value);
 			current.kids.add(kid);
 		}
 		return current;

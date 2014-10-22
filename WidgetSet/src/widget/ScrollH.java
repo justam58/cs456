@@ -162,9 +162,11 @@ public class ScrollH extends SOReflect implements Interactable, Drawable {
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("slide")){
 				Root root = getPanel();
-				System.out.println(root.model.getValue(models, root.model, 0));
-				double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
-				slider.moveTo(valueFromModel(modelValue), -1);
+				Object value = root.model.getValue(models, root.model, 0);
+				if(value != null){
+					double modelValue = (Double)(root.model.getValue(models, root.model, 0));
+					slider.moveTo(valueFromModel(modelValue), -1);
+				}
 			}
 		}
 	}
@@ -241,7 +243,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable {
 					String classVal = shape.getString("class");
 					Root root = getPanel();
 					if(classVal != null && classVal.equals("up") && models.size() > 0){
-						String value = root.model.getValue(models, root.model, 0);
+						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)+step;
 						if(newValue > max){
 							newValue = max;
@@ -250,7 +252,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable {
 						slider.moveTo(valueFromModel(newValue), -1);
 					}
 					else if(classVal != null && classVal.equals("down") && models.size() > 0){
-						String value = root.model.getValue(models, root.model, 0);
+						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)-step;
 						if(newValue < min){
 							newValue = min;

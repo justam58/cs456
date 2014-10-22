@@ -131,7 +131,7 @@ public class TextBox extends SOReflect implements Interactable, Drawable {
 				if(selectPath != null){
 					updateState(true, false);
 					if(edit){
-						textContent.editing(x,y,myTransform);
+						textContent.editing(x);
 					}
 					return true;
 				}

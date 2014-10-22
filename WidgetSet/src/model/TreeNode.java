@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class TreeNode {
 	
 	public String attribute;
-	public String value;
+	public Object value;
 	public ArrayList<TreeNode> kids = new ArrayList<TreeNode>();
 	
 	public TreeNode(String attribute, String value){
@@ -13,7 +13,7 @@ public class TreeNode {
 		this.value = value;
 	}
 	
-	public String getValue(ArrayList<String> models, TreeNode current, int index){
+	public Object getValue(ArrayList<String> models, TreeNode current, int index){
 		if(models.size()-1 == index){
 			String target = models.get(index);
 			for(int i = 0; i < current.kids.size(); i++){
@@ -56,10 +56,14 @@ public class TreeNode {
 	}
 	
 	private void printRec(TreeNode current){
-		System.out.print(current.attribute);
-		if(!current.attribute.equals("")){
-			System.out.print(" : ");
+		if(!current.attribute.equals("array")){
+			System.out.print(current.attribute);
+			if(!current.attribute.equals("")){
+				System.out.print(" : ");
+			}
 		}
+
+
 		if(current.kids.size() == 0){
 			System.out.print(current.value);
 		}

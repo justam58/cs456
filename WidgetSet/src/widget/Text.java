@@ -2,10 +2,10 @@ package widget;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.TextField;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -31,7 +31,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public double cursor = -1;
 	
 	public Rectangle boundingBox = null;
-	public TextField textField;
+	private FontMetrics fontMetrics;
 
 	@Override
 	public void setStyle(SO style) {
@@ -54,6 +54,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
 		}
 		setBoundingBox((Graphics2D)g);
+		fontMetrics = g.getFontMetrics(new Font(this.font,Font.PLAIN,(int)size));
 
 //		g.drawRect((int)boundingBox.getX(), (int)boundingBox.getY(), (int)boundingBox.getWidth(), (int)boundingBox.getHeight());
 	}
@@ -106,7 +107,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		if(edit){
 			ArrayList<Integer> selectedPath = select(x,y,0,myTransform);
 			if(selectedPath != null){
-				editing(x,y,myTransform);
+				editing(x);
 				return true;
 			}
 			cursor = -1;
@@ -114,15 +115,31 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return false;
 	}
 	
-	public double setCursor() {
-		// TODO
-		return 0;
+	public double calculateCursor(double x) {
+		String textWithCursor;
+		if(cursor >= 0){
+			textWithCursor = text.substring(0, (int)cursor) + "|" + text.substring((int)cursor);
+		}
+		else
+		{
+			textWithCursor = text;
+		}
+		for(int i = 0; i < textWithCursor.length(); i++){
+			String sub = textWithCursor.substring(0,i);
+			int width = fontMetrics.stringWidth(sub);
+			if((x-this.x) < width)
+			{
+				return (i-1) == -1 ? 0 : i-1;
+			}
+		}
+		return textWithCursor.length();
 	}
 
-	public void editing(double x, double y, AffineTransform myTransform){
+	public void editing(double x){
+		System.out.println("editing");
 		Root root = getPanel();
 		root.setKeyFocus(this);
-		this.cursor = setCursor();
+		this.cursor = calculateCursor(x);
 		root.repaint();
 	}
 
