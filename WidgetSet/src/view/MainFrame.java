@@ -16,8 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import model.Root;
-import able.*;
+import widget.Root;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
@@ -74,7 +73,7 @@ public class MainFrame extends JFrame{
                 if (file != null && returnVal == JFileChooser.APPROVE_OPTION) {
                     try {
                         contentPanel.clean();
-                        SONReader reader = new SONReader(new String[]{"model"}, new FileInputStream(file));
+                        SONReader reader = new SONReader(new String[]{"widget"}, new FileInputStream(file));
                         SV sv = reader.read();
                         SO style = sv.getSO();
                         Root root = (Root) style;

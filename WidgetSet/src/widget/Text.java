@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -28,22 +28,21 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public double size;
 	
 	public boolean edit;
-	public double cursor;
-	
-	private boolean editing = false;
+	public double cursor = -1;
 	
 	public Rectangle boundingBox = null;
 	public TextField textField;
 
 	@Override
 	public void setStyle(SO style) {
+		// do nothing
 	}
 
 	@Override
 	public void paint(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(new Font(font,Font.PLAIN,(int)size));
-		if(editing && cursor >= 0){
+		if(cursor >= 0){
 			if(cursor > text.length()){
 				cursor = text.length();
 			}
@@ -107,15 +106,24 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		if(edit){
 			ArrayList<Integer> selectedPath = select(x,y,0,myTransform);
 			if(selectedPath != null){
-				Root root = getPanel();
-				root.setKeyFocus(this);
-				root.repaint();
-				editing = true;
+				editing(x,y,myTransform);
 				return true;
 			}
-			editing = false;
+			cursor = -1;
 		}
 		return false;
+	}
+	
+	public double setCursor() {
+		// TODO
+		return 0;
+	}
+
+	public void editing(double x, double y, AffineTransform myTransform){
+		Root root = getPanel();
+		root.setKeyFocus(this);
+		this.cursor = setCursor();
+		root.repaint();
 	}
 
 	@Override
@@ -152,29 +160,9 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return InteractableParent.getPanel();
 	}
 
-	@Override
-	public void changeBackgroundColor(Color c) {
-		// do nothing
-	}
-	
-	@Override
+
 	public void changeLabel(String label) {
 		text = label;
-	}
-	
-	@Override
-	public double move(double dx, double dy, Interactable range) {
-		return 0;
-	}
-	
-	@Override
-	public double getSliderHeight() {
-		return 0;
-	}
-	
-	@Override
-	public void moveTo(double x, double y) {
-		// do nothing
 	}
 
 }

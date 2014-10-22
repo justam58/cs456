@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,13 +9,15 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import able.ColorChangable;
+import able.Dragable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 import spark.data.SO;
 import spark.data.SOReflect;
 
-public class Rect extends SOReflect implements Drawable, Selectable, Interactable {
+public class Rect extends SOReflect implements Drawable, Selectable, Interactable, Dragable, ColorChangable {
 	
 	// Rect{ left:0, top:100, width:10, height:10, thickness:2, border:{r:0,g:0,b:0}, fill:{r:0,g:0,b:128} } 
 	public double left;
@@ -127,31 +129,26 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean key(char key) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Root getPanel() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -159,46 +156,29 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	public void changeBackgroundColor(Color c) {
 		fill = c;
 	}
-
-	@Override
-	public void changeLabel(String label) {
-		// do nothing
-	}
 	
 	@Override
-	public double move(double dx, double dy, Interactable range) {
-		if(dx == 0){
+	public double move(double dx, double dy, double max, double min) {
+		if(dy != 0){
 			top += dy;
-			if(range instanceof Rect){
-				Rect rangeRect = (Rect)range;
-				if(top < rangeRect.top){
-					top = rangeRect.top;
-				}
-				if((top+height) > (rangeRect.top+rangeRect.height)){
-					top = rangeRect.top+rangeRect.height-height;
-				}
-			}
-			if(range instanceof Line){
-				Line rangeLine = (Line)range;
-				double yTop = Math.min(rangeLine.y1, rangeLine.y2);
-				double yBot = Math.max(rangeLine.y1, rangeLine.y2);
-				if(top < yTop){
-					top = yTop;
-				}
-				if((top+height) > yBot){
-					top = yBot-height;
-				}
-			}
+			top = top > max ? max : top;
+			top = top < min ? min : top;
 			return top;
 		}
-		else{// dy ==0
-			return left;
-		}
+		left += dx;
+		left = left > max ? max : left;
+		left = left < min ? min : left;
+		return left;
 	}
 	
 	@Override
 	public double getSliderHeight() {
 		return height;
+	}
+	
+	@Override
+	public double getSliderWidth() {
+		return width;
 	}
 	
 	@Override
@@ -210,4 +190,5 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 			top = y;
 		}
 	}
+
 }

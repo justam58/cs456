@@ -1,7 +1,9 @@
-package view;
+package main;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+
+import view.MainFrame;
 
 
 public class Main {

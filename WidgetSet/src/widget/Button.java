@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,6 +9,7 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import able.ColorChangable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
@@ -30,7 +31,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				Interactable activeShape = (Interactable)shape;
+				ColorChangable activeShape = (ColorChangable)shape;
 				if(clicked && state.equals("idle")){
 					activeShape.changeBackgroundColor(active);
 				}
@@ -168,7 +169,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				Interactable activeShape = (Interactable)shape;
+				ColorChangable activeShape = (ColorChangable)shape;
 				if(state.equals("active")){
 					activeShape.changeBackgroundColor(active);
 				}
@@ -177,7 +178,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 				}
 			}
 			if(classVal != null && classVal.equals("label")){
-				Interactable activeShape = (Interactable)shape;
+				Text activeShape = (Text)shape;
 				activeShape.changeLabel(label);
 			}
 		}
@@ -190,28 +191,4 @@ public class Button extends SOReflect implements Drawable, Interactable {
 		}
 	}
 
-	@Override
-	public void changeBackgroundColor(Color c) {
-		// do nothing
-	}
-	
-	@Override
-	public void changeLabel(String label) {
-		// do nothing
-	}
-	
-	@Override
-	public double move(double dx, double dy, Interactable range) {
-		return 0;
-	}
-	
-	@Override
-	public double getSliderHeight() {
-		return 0;
-	}
-	
-	@Override
-	public void moveTo(double x, double y) {
-		// do nothing
-	}
 }

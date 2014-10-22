@@ -22,8 +22,6 @@ public class TreeNode {
 				}
 			}
 		}
-		System.out.println(models.size()-1);
-		System.out.println(index);
 		String target = models.get(index);
 		for(int i = 0; i < current.kids.size(); i++){
 			if(current.kids.get(i).attribute.equals(target)){

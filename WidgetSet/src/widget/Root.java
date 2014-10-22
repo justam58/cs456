@@ -1,11 +1,11 @@
-package model;
+package widget;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import model.TreeNode;
 import able.Drawable;
 import able.Interactable;
 import spark.data.SA;
@@ -99,16 +99,19 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
+		boolean handled = false;
 		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
 			Interactable shape = (Interactable)contents.get(i);
-			boolean handled = shape.mouseDown(x,y,getTransform());
-			if(handled){
-				return true;
+			boolean shapeHandled = shape.mouseDown(x,y,getTransform());
+			if(!handled && shapeHandled){
+				handled = true;
 			}
 		}
-		releaseKeyFocus();
+		if(!handled){
+			releaseKeyFocus();	
+		}
 		repaint();
-		return false;
+		return handled;
 	}
 
 	@Override
@@ -134,7 +137,7 @@ public class Root extends SOReflect implements Drawable, Interactable {
 			}
 		}
 		model.print();
-		return false;
+		return true;
 	}
 
 	@Override
@@ -152,29 +155,5 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	public Root getPanel() {
 		return this;
 	}
-	
-	@Override
-	public void changeBackgroundColor(Color c) {
-		// do nothing
-	}
 
-	@Override
-	public void changeLabel(String label) {
-		// do nothing
-	}
-
-	@Override
-	public double move(double dx, double dy, Interactable range) {
-		return 0;
-	}
-	
-	@Override
-	public double getSliderHeight() {
-		return 0;
-	}
-	
-	@Override
-	public void moveTo(double x, double y) {
-		// do nothing
-	}
 }

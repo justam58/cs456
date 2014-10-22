@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

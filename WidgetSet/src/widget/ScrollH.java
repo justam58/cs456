@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,11 +10,13 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import able.ColorChangable;
+import able.Dragable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class ScrollV extends SOReflect implements Interactable, Drawable {
+public class ScrollH extends SOReflect implements Interactable, Drawable {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
@@ -28,16 +30,19 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 	public Color active;
 	
 	private boolean dragging = false;
-	private int slider = -1;
-	private int ranger = -1;
+	private Dragable slider;
+	private Interactable ranger;
 	private double d_dragStart;
+	private double sliderMax;
+	private double sliderMin;
+	private double sliderWidth;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int j = 0; j < contents.size(); j++){
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				Interactable activeShape = (Interactable)shape;
+				ColorChangable activeShape = (ColorChangable)shape;
 				if(clicked && state.equals("idle")){
 					activeShape.changeBackgroundColor(active);
 				}
@@ -63,42 +68,27 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 		getPanel().repaint();
 	}
 	
-	private double valueToModel(double v, double sliderHeight){
-		Interactable rangerShape = (Interactable)contents.get(ranger);
-		double sliderMax = 10;
-		double sliderMin = 110;
-		if(rangerShape instanceof Rect){
-			Rect rangeRect = (Rect)rangerShape;
-			sliderMin = rangeRect.top;
-			sliderMax = rangeRect.top+rangeRect.height-sliderHeight;
+	private void setSliderMaxAndMin(){
+		if(ranger instanceof Rect){
+			Rect rangeRect = (Rect)ranger;
+			sliderMin = rangeRect.left;
+			sliderMax = rangeRect.left+rangeRect.width-sliderWidth;
 		}
-		if(rangerShape instanceof Line){
-			Line rangeLine = (Line)rangerShape;
-			double yTop = Math.min(rangeLine.y1, rangeLine.y2);
-			double yBot = Math.max(rangeLine.y1, rangeLine.y2);
-			sliderMin = yTop;
-			sliderMax = yBot-sliderHeight;
+		if(ranger instanceof Line){
+			Line rangeLine = (Line)ranger;
+			double xRight = Math.min(rangeLine.x1, rangeLine.x2);
+			double yLeft = Math.max(rangeLine.x1, rangeLine.x2);
+			sliderMin = yLeft;
+			sliderMax = xRight-sliderWidth;
 		}
-		return max-((v-sliderMin)*(max-min)/(sliderMax-sliderMin));
 	}
 	
-	private double valueFromModel(double v, double sliderHeight){
-		Interactable rangerShape = (Interactable)contents.get(ranger);
-		double sliderMax = 10;
-		double sliderMin = 110;
-		if(rangerShape instanceof Rect){
-			Rect rangeRect = (Rect)rangerShape;
-			sliderMin = rangeRect.top;
-			sliderMax = rangeRect.top+rangeRect.height-sliderHeight;
-		}
-		if(rangerShape instanceof Line){
-			Line rangeLine = (Line)rangerShape;
-			double yTop = Math.min(rangeLine.y1, rangeLine.y2);
-			double yBot = Math.max(rangeLine.y1, rangeLine.y2);
-			sliderMin = yTop;
-			sliderMax = yBot-sliderHeight;
-		}
-		return sliderMax-((v-min)*(sliderMax-sliderMin)/(max-min));
+	private double valueToModel(double v){
+		return ((v-sliderMin)*(max-min)/(sliderMax-sliderMin))+min;
+	}
+	
+	private double valueFromModel(double v){
+		return ((v-min)*(sliderMax-sliderMin)/(max-min))+sliderMin;
 	}
 	
 	@Override
@@ -147,7 +137,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				Interactable activeShape = (Interactable)shape;
+				ColorChangable activeShape = (ColorChangable)shape;
 				if(state.equals("active")){
 					activeShape.changeBackgroundColor(active);
 				}
@@ -156,10 +146,14 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 				}
 			}
 			if(classVal != null && classVal.equals("range")){
-				ranger = j;
+				Interactable rangerShape = (Interactable)shape;
+				ranger = rangerShape;
 			}
 			if(classVal != null && classVal.equals("slide")){
-				slider = j;
+				Dragable dragableSlider = (Dragable)shape;
+				slider = dragableSlider;
+				sliderWidth = slider.getSliderWidth();
+				setSliderMaxAndMin();
 			}
 		}
 		
@@ -167,10 +161,10 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("slide")){
-				Interactable sliderShape = (Interactable)shape;
 				Root root = getPanel();
+				System.out.println(root.model.getValue(models, root.model, 0));
 				double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
-				sliderShape.moveTo(-1, valueFromModel(modelValue,sliderShape.getSliderHeight()));
+				slider.moveTo(valueFromModel(modelValue), -1);
 			}
 		}
 	}
@@ -194,10 +188,9 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 					String classVal = shape.getString("class");
 					if(classVal != null && classVal.equals("slide")){
 						dragging = true;
-						slider = i;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
-						d_dragStart = endp.getY();
+						d_dragStart = endp.getX();
 					}
 					return true;
 				}
@@ -212,12 +205,9 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			Point2D endp = new Point2D.Double();
 			myTransform.transform(new Point2D.Double(x,y), endp);
 			
-			double d_delta = (endp.getY() - d_dragStart);
-			d_dragStart = endp.getY();
-			Interactable sliderShape = (Interactable)contents.get(slider);
-			Interactable rangerShape = (Interactable)contents.get(ranger);
-			double newValue = sliderShape.move(0, d_delta, rangerShape);
-			double newModelValue = valueToModel(newValue,sliderShape.getSliderHeight());
+			double d_delta = (endp.getX() - d_dragStart);
+			d_dragStart = endp.getX();
+			double newModelValue = valueToModel(slider.move(d_delta, 0, sliderMax, sliderMin));
 			Root root = getPanel();
 			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
@@ -257,8 +247,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 							newValue = max;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						Interactable sliderShape = (Interactable)contents.get(slider);
-						sliderShape.moveTo(-1, valueFromModel(newValue,sliderShape.getSliderHeight()));
+						slider.moveTo(valueFromModel(newValue), -1);
 					}
 					else if(classVal != null && classVal.equals("down") && models.size() > 0){
 						String value = root.model.getValue(models, root.model, 0);
@@ -267,8 +256,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 							newValue = min;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						Interactable sliderShape = (Interactable)contents.get(slider);
-						sliderShape.moveTo(-1, valueFromModel(newValue,sliderShape.getSliderHeight()));
+						slider.moveTo(valueFromModel(newValue), -1);
 					}
 					state = "idle";
 					return true;
@@ -292,31 +280,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 		}
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
-	}
-
-	@Override
-	public void changeBackgroundColor(Color c) {
-		// do nothing
-	}
-
-	@Override
-	public void changeLabel(String label) {
-		// do nothing
-	}
-	
-	@Override
-	public double move(double dx, double dy, Interactable range) {
-		return 0;
-	}
-	
-	@Override
-	public double getSliderHeight() {
-		return 0;
-	}
-	
-	@Override
-	public void moveTo(double x, double y) {
-		// do nothing
 	}
 
 }

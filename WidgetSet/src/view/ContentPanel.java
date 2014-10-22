@@ -11,7 +11,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPanel;
 
-import model.Root;
+import widget.Root;
 
 @SuppressWarnings("serial")
 public class ContentPanel extends JPanel {
@@ -67,7 +67,6 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-//			System.out.println("mousePressed (" + e.getX() + ", " + e.getY() + ")");
 			Point2D p = new Point2D.Double(e.getX(),e.getY());
 			root.mouseDown(p.getX(), p.getY(), new AffineTransform());
 			requestFocusInWindow();
@@ -75,7 +74,6 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-//			System.out.println("mouseReleased (" + e.getX() + ", " + e.getY() + ")");
 			Point2D p = new Point2D.Double(e.getX(),e.getY());
 			root.mouseUp(p.getX(), p.getY(), new AffineTransform());
 		}
@@ -91,7 +89,6 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-//			System.out.println("mouseMoved (" + e.getX() + ", " + e.getY() + ")");
 			if(painted){
 				Point2D p = new Point2D.Double(e.getX(),e.getY());
 				root.mouseMove(p.getX(), p.getY(), new AffineTransform());

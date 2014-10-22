@@ -1,4 +1,4 @@
-package model;
+package widget;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -60,14 +60,12 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 				atf.rotate(Math.toRadians(rotate));
 				atf.translate(-tx, -ty);
 				Selectable shape = (Selectable)content;
-				System.out.println("group try select");
 				ArrayList<Integer> selectPath = shape.select(x,y,i,atf);
 				// If any of the contents are selected 
 				// then this should take the selection path from the selected child and add this group's index onto the front and return the more complete path.
 				// This will recursively build a path to the selected object.
 				if(selectPath != null){
 					selectPath.add(0, myIndex);
-					System.out.println("select "+selectPath);
 					return selectPath;
 				}
 			}
@@ -87,15 +85,16 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 		atf.scale(1/sx, 1/sy);
 		atf.rotate(Math.toRadians(rotate));
 		atf.translate(-tx, -ty);
+		boolean handled = false;
 		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
 			// recursively call select on its contents
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.mouseDown(x, y, atf);
-			if(handeled){
-				return true;
+			Interactable shape = (Interactable)contents.get(i);
+			boolean shapeHandled = shape.mouseDown(x,y,atf);
+			if(!handled && shapeHandled){
+				handled = true;
 			}
 		}
-		return false;
+		return handled;
 	}
 
 	@Override
@@ -153,31 +152,6 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 		}
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
-	}
-	
-	@Override
-	public void changeBackgroundColor(Color c) {
-		// do nothing
-	}
-
-	@Override
-	public void changeLabel(String label) {
-		// do nothing
-	}
-
-	@Override
-	public double move(double dx, double dy, Interactable range) {
-		return 0;
-	}
-
-	@Override
-	public double getSliderHeight() {
-		return 0;
-	}
-
-	@Override
-	public void moveTo(double x, double y) {
-		// do nothing
 	}
 
 }
