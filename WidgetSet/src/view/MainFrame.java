@@ -86,11 +86,13 @@ public class MainFrame extends JFrame{
                     			e1,
                     		    "SON Parsing error",
                     		    JOptionPane.ERROR_MESSAGE);
+                    	e1.printStackTrace();
                     } catch (ClassCastException e1){
                     	JOptionPane.showMessageDialog(null,
                     		    "There should be a ROOT at the root level.",
                     		    "SON Parsing error",
                     		    JOptionPane.ERROR_MESSAGE);
+                    	e1.printStackTrace();
                     }
                 }
 	        }

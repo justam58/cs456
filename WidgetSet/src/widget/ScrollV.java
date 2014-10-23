@@ -6,17 +6,18 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import listener.ActiveListener;
+import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import able.ColorChangable;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class ScrollV extends SOReflect implements Interactable, Drawable {
+public class ScrollV extends SOReflect implements Interactable, Drawable, ModelListener {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
@@ -36,36 +37,34 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 	private double sliderMax;
 	private double sliderMin;
 	private double sliderHeight;
+	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
+	private Root root = getPanel();
 	
 	private void updateState(boolean clicked, boolean hovered){
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
-				if(clicked && state.equals("idle")){
-					activeShape.changeBackgroundColor(active);
+		for(int i = 0; i < listeners.size();i++){
+			ActiveListener listener = listeners.get(i);
+			if(clicked && state.equals("idle")){
+				listener.stateChanged(active);
+			}
+			else if(clicked && state.equals("active")){
+				listener.stateChanged(idle);
+			}
+			else if(!clicked && hovered){ // hover
+				listener.stateChanged(hover);
+			}
+			else if(!clicked && !hovered){ //idle or active
+				if(state.equals("idle")){
+					listener.stateChanged(idle);
 				}
-				else if(clicked && state.equals("active")){
-					activeShape.changeBackgroundColor(idle);
-				}
-				else if(!clicked && hovered){ // hover
-					activeShape.changeBackgroundColor(hover);
-				}
-				else if(!clicked && !hovered){ //idle or active
-					if(state.equals("idle")){
-						activeShape.changeBackgroundColor(idle);
-					}
-					else{
-						activeShape.changeBackgroundColor(active);
-					}
+				else{
+					listener.stateChanged(active);
 				}
 			}
 		}
 		if(clicked && state.equals("idle")){
 			state = "active";
 		}
-		getPanel().repaint();
+		root.repaint();
 	}
 	
 	private void setSliderMaxAndMin(){
@@ -132,17 +131,19 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			}
 		}
 		
+		root.model.addListener(models, root.model, 0, this);
 		
 		for(int j = 0; j < contents.size(); j++){
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
+				ActiveListener listener = (ActiveListener)shape;
+				listeners.add(listener);
 				if(state.equals("active")){
-					activeShape.changeBackgroundColor(active);
+					listener.stateChanged(active);
 				}
 				else if(state.equals("idle")){
-					activeShape.changeBackgroundColor(idle);
+					listener.stateChanged(idle);
 				}
 			}
 			if(classVal != null && classVal.equals("range")){
@@ -161,11 +162,10 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("slide")){
-				Root root = getPanel();
 				Object value = root.model.getValue(models, root.model, 0);
 				if(value != null){
-					double modelValue = (Double)(root.model.getValue(models, root.model, 0));
-					slider.moveTo(-1, valueFromModel(modelValue));
+					double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+					slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
 				}
 			}
 		}
@@ -210,7 +210,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 			double d_delta = (endp.getY() - d_dragStart);
 			d_dragStart = endp.getY();
 			double newModelValue = valueToModel(slider.move(0, d_delta, sliderMax, sliderMin));
-			Root root = getPanel();
 			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
 			updateState(true, false);
@@ -241,7 +240,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 					updateState(false, true);
 					SOReflect shape = (SOReflect)content;
 					String classVal = shape.getString("class");
-					Root root = getPanel();
 					if(classVal != null && classVal.equals("up") && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)+step;
@@ -249,7 +247,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 							newValue = max;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(-1, valueFromModel(newValue));
+						slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 					}
 					else if(classVal != null && classVal.equals("down") && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
@@ -258,7 +256,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 							newValue = min;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(-1, valueFromModel(newValue));
+						slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 					}
 					state = "idle";
 					return true;
@@ -282,6 +280,14 @@ public class ScrollV extends SOReflect implements Interactable, Drawable {
 		}
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
+	}
+
+	@Override
+	public void modelChanged(String newValue) {
+		double modelValue = Double.valueOf(newValue);
+		if(modelValue != slider.getCurrentY()){
+			slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+		}
 	}
 
 }

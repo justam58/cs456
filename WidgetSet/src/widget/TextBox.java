@@ -5,16 +5,17 @@ import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import listener.ActiveListener;
+import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import able.ColorChangable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class TextBox extends SOReflect implements Interactable, Drawable {
+public class TextBox extends SOReflect implements Interactable, Drawable, ModelListener {
 	
 	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...] }
 	public String label;
@@ -27,34 +28,32 @@ public class TextBox extends SOReflect implements Interactable, Drawable {
 	public boolean edit;
 	public double cursor = -1;
 	
-	public Text textContent;
+	private Text textContent;
+	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
+	private Root root = getPanel();
 	
 	private void updateState(boolean clicked, boolean hovered){
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
-				if(clicked){
-					activeShape.changeBackgroundColor(active);
+		for(int i = 0; i < listeners.size(); i++){
+			ActiveListener listener = listeners.get(i);
+			if(clicked){
+				listener.stateChanged(active);
+			}
+			else if(!clicked && !state.equals("active") && hovered){ // hover
+				listener.stateChanged(hover);
+			}
+			else if(!clicked && !hovered){ //idle or active
+				if(state.equals("idle")){
+					listener.stateChanged(idle);
 				}
-				else if(!clicked && !state.equals("active") && hovered){ // hover
-					activeShape.changeBackgroundColor(hover);
-				}
-				else if(!clicked && !hovered){ //idle or active
-					if(state.equals("idle")){
-						activeShape.changeBackgroundColor(idle);
-					}
-					else{
-						activeShape.changeBackgroundColor(active);
-					}
+				else{
+					listener.stateChanged(active);
 				}
 			}
 		}
 		if(clicked && state.equals("idle")){
 			state = "active";
 		}
-		getPanel().repaint();
+		root.repaint();
 	}
 
 	@Override
@@ -98,19 +97,24 @@ public class TextBox extends SOReflect implements Interactable, Drawable {
 			}
 		}
 		
+		root.model.addListener(models, root.model, 0, this);
+		
 		for(int j = 0; j < contents.size(); j++){
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
+				ActiveListener listener = (ActiveListener)shape;
+				listeners.add(listener);
 				if(state.equals("idle")){
-					activeShape.changeBackgroundColor(idle);
+					listener.stateChanged(idle);
 				}
 			}
 			if(classVal != null && classVal.equals("content")){
 				textContent = (Text)shape;
 				textContent.edit = this.edit;
 				textContent.cursor = this.cursor;
+				textContent.models = this.models;
+				textContent.text = root.model.getValue(models, root.model, 0);
 			}
 		}
 	}
@@ -177,6 +181,13 @@ public class TextBox extends SOReflect implements Interactable, Drawable {
 		}
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
+	}
+
+	@Override
+	public void modelChanged(String newValue) {
+		if(textContent.text != newValue){
+			textContent.text = newValue;
+		}
 	}
 
 }

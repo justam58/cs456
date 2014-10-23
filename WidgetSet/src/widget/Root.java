@@ -110,7 +110,7 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	private TreeNode buildArray(TreeNode current, SA array) {
 		for(int i = 0; i < array.size(); i++){
 			SV value = array.get(i);
-			TreeNode kid = build(new TreeNode("",""),"array",value);
+			TreeNode kid = build(new TreeNode(String.valueOf(i),""),String.valueOf(i),value);
 			current.kids.add(kid);
 		}
 		return current;

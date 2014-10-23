@@ -9,7 +9,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import able.ColorChangable;
+import listener.ActiveListener;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
@@ -17,7 +17,7 @@ import able.Selectable;
 import spark.data.SO;
 import spark.data.SOReflect;
 
-public class Rect extends SOReflect implements Drawable, Selectable, Interactable, Dragable, ColorChangable {
+public class Rect extends SOReflect implements Drawable, Selectable, Interactable, Dragable, ActiveListener {
 	
 	// Rect{ left:0, top:100, width:10, height:10, thickness:2, border:{r:0,g:0,b:0}, fill:{r:0,g:0,b:128} } 
 	public double left;
@@ -153,7 +153,7 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	}
 	
 	@Override
-	public void changeBackgroundColor(Color c) {
+	public void stateChanged(Color c) {
 		fill = c;
 	}
 	
@@ -182,13 +182,27 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	}
 	
 	@Override
-	public void moveTo(double x, double y) {
+	public void moveTo(double x, double y, double max, double min) {
 		if(x != -1){
 			left = x;
+			left = left > max ? max : left;
+			left = left < min ? min : left;
 		}
 		if(y != -1){
 			top = y;
+			top = top > max ? max : top;
+			top = top < min ? min : top;
 		}
+	}
+	
+	@Override
+	public double getCurrentX() {
+		return left;
+	}
+
+	@Override
+	public double getCurrentY() {
+		return top;
 	}
 
 }

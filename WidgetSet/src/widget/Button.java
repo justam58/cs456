@@ -5,11 +5,11 @@ import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import listener.ActiveListener;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import able.ColorChangable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
@@ -26,35 +26,34 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	public Color active;
 	public double value;
 	
+	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
+	private Root root = getPanel();
+	
 	private void updateState(boolean clicked, boolean hovered){
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
-				if(clicked && state.equals("idle")){
-					activeShape.changeBackgroundColor(active);
+		for(int i = 0; i < listeners.size(); i++){
+			ActiveListener listener = listeners.get(i);
+			if(clicked && state.equals("idle")){
+				listener.stateChanged(active);
+			}
+			else if(clicked && state.equals("active")){
+				listener.stateChanged(idle);
+			}
+			else if(!clicked && hovered){ // hover
+				listener.stateChanged(hover);
+			}
+			else if(!clicked && !hovered){ //idle or active
+				if(state.equals("idle")){
+					listener.stateChanged(idle);
 				}
-				else if(clicked && state.equals("active")){
-					activeShape.changeBackgroundColor(idle);
-				}
-				else if(!clicked && hovered){ // hover
-					activeShape.changeBackgroundColor(hover);
-				}
-				else if(!clicked && !hovered){ //idle or active
-					if(state.equals("idle")){
-						activeShape.changeBackgroundColor(idle);
-					}
-					else{
-						activeShape.changeBackgroundColor(active);
-					}
+				else{
+					listener.stateChanged(active);
 				}
 			}
 		}
 		if(clicked && state.equals("idle")){
 			state = "active";
 		}
-		getPanel().repaint();
+		root.repaint();
 	}
 	
 	@Override
@@ -96,7 +95,6 @@ public class Button extends SOReflect implements Drawable, Interactable {
 				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
 				if(selectPath != null){
 					updateState(false, true);
-					Root root = getPanel();
 					if(state.equals("active") && models.size() > 0){
 						root.model = root.model.update(models, root.model, 0, String.valueOf(value));
 					}
@@ -169,12 +167,13 @@ public class Button extends SOReflect implements Drawable, Interactable {
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
-				ColorChangable activeShape = (ColorChangable)shape;
+				ActiveListener activeShape = (ActiveListener)shape; 
+				listeners.add(activeShape);
 				if(state.equals("active")){
-					activeShape.changeBackgroundColor(active);
+					activeShape.stateChanged(active);
 				}
-				else{ // active
-					activeShape.changeBackgroundColor(idle);
+				else{
+					activeShape.stateChanged(idle);
 				}
 			}
 			if(classVal != null && classVal.equals("label")){

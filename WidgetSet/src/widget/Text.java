@@ -29,9 +29,11 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	
 	public boolean edit;
 	public double cursor = -1;
+	public ArrayList<String> models = null; 
 	
 	public Rectangle boundingBox = null;
 	private FontMetrics fontMetrics;
+	private Root root = getPanel();
 
 	@Override
 	public void setStyle(SO style) {
@@ -136,8 +138,6 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	}
 
 	public void editing(double x){
-		System.out.println("editing");
-		Root root = getPanel();
 		root.setKeyFocus(this);
 		this.cursor = calculateCursor(x);
 		root.repaint();
@@ -157,13 +157,19 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public boolean key(char key) {
 		if((int)key == 8 && cursor > 0){// back space
 			text = text.substring(0,(int)cursor-1) + text.substring((int)cursor);
+			if(models != null){
+				root.model.update(models, root.model, 0, text);
+			}
 			cursor--;
 		}
 		else{
 			text = text.substring(0,(int)cursor) + key + text.substring((int)cursor);
+			if(models != null){
+				root.model.update(models, root.model, 0, text);
+			}
 			cursor++;
 		}
-		getPanel().repaint();
+		root.repaint();
 		return true;
 	}
 
