@@ -33,11 +33,11 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	
 	public Rectangle boundingBox = null;
 	private FontMetrics fontMetrics;
-	private Root root = getPanel();
+	private Root root = null;
 
 	@Override
 	public void setStyle(SO style) {
-		// do nothing
+		root = getPanel();
 	}
 
 	@Override

@@ -60,9 +60,9 @@ public class Root extends SOReflect implements Drawable, Interactable {
 		
 		SO contentsObj = style.getObj("contents");
 		System.out.println("root"+contentsObj);
-//		Drawable shape = (Drawable)contentsObj;
-//		shape.setStyle(contentsObj);
-//		content = shape;
+		Drawable shape = (Drawable)contentsObj;
+		shape.setStyle(contentsObj);
+		content = shape;
 	}
 	
 	private TreeNode build(TreeNode current, String name, SV value){

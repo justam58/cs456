@@ -29,7 +29,7 @@ public class MainFrame extends JFrame{
 	
     public MainFrame() {
     	// setup
-        super("Draw Tree");
+        super("Widget Set");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(800, 600));
     	setSize(new Dimension(800, 600));
@@ -86,13 +86,11 @@ public class MainFrame extends JFrame{
                     			e1,
                     		    "SON Parsing error",
                     		    JOptionPane.ERROR_MESSAGE);
-                    	e1.printStackTrace();
                     } catch (ClassCastException e1){
                     	JOptionPane.showMessageDialog(null,
                     		    "There should be a ROOT at the root level.",
                     		    "SON Parsing error",
                     		    JOptionPane.ERROR_MESSAGE);
-                    	e1.printStackTrace();
                     }
                 }
 	        }

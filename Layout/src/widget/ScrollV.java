@@ -38,7 +38,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 	private double sliderMin;
 	private double sliderHeight;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
-	private Root root = getPanel();
+	private Root root = null;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size();i++){
@@ -131,8 +131,6 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 			}
 		}
 		
-		root.model.addListener(models, root.model, 0, this);
-		
 		for(int j = 0; j < contents.size(); j++){
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
@@ -158,6 +156,9 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 			}
 		}
 		
+		root = getPanel();
+		root.model.addListener(models, root.model, 0, this);
+		
 		for(int j = 0; j < contents.size(); j++){
 			SOReflect shape = (SOReflect)contents.get(j);
 			String classVal = shape.getString("class");
@@ -169,6 +170,7 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 				}
 			}
 		}
+		
 	}
 
 	@Override

@@ -16,10 +16,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import widget.Root;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
+import widget.Root;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -86,13 +86,11 @@ public class MainFrame extends JFrame{
                     			e1,
                     		    "SON Parsing Error",
                     		    JOptionPane.ERROR_MESSAGE);
-                    	e1.printStackTrace();
                     } catch (ClassCastException e1){
                     	JOptionPane.showMessageDialog(null,
                     		    "There should be a ROOT at the root level.",
                     		    "SON Parsing Error",
                     		    JOptionPane.ERROR_MESSAGE);
-                    	e1.printStackTrace();
                     }
                 }
 	        }

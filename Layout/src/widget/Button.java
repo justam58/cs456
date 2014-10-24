@@ -27,7 +27,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	public double value;
 	
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
-	private Root root = getPanel();
+	private Root root = null;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -181,6 +181,8 @@ public class Button extends SOReflect implements Drawable, Interactable {
 				activeShape.changeLabel(label);
 			}
 		}
+		
+		root = getPanel();
 	}
 	
 	@Override
