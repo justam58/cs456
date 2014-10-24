@@ -59,7 +59,6 @@ public class Root extends SOReflect implements Drawable, Interactable {
 		model.print();
 		
 		SO contentsObj = style.getObj("contents");
-		System.out.println("root"+contentsObj);
 		Drawable shape = (Drawable)contentsObj;
 		shape.setStyle(contentsObj);
 		content = shape;

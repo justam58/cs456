@@ -136,6 +136,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 			String classVal = shape.getString("class");
 			if(classVal != null && classVal.equals("active")){
 				ActiveListener listener = (ActiveListener)shape;
+				listeners.add(listener);
 				if(state.equals("active")){
 					listener.stateChanged(active);
 				}

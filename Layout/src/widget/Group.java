@@ -26,10 +26,8 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 	@Override
 	public void setStyle(SO style){
 		SA contentsArray = style.getArray("contents");
-		System.out.println("array"+contentsArray);
 		for(int i = 0; i < contentsArray.size(); i++){
 			SO shapeObj = contentsArray.getSO(i);
-			System.out.println("shape"+shapeObj);
 			Drawable shape = (Drawable)shapeObj;
 			shape.setStyle(shapeObj);
 			contents.add(shape);
