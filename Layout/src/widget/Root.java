@@ -12,6 +12,7 @@ import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SV;
 import view.ContentPanel;
+import view.Layout;
 
 public class Root extends SOReflect implements Drawable, Interactable {
 	
@@ -42,6 +43,12 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	
 	public void repaint(){
 		contentPanel.repaint();
+	}
+	
+	public void resize(double width, double height){
+		System.out.println(width + ", " + height);
+		Layout layout = (Layout)content;
+		// TODO which method to call
 	}
 	
 	private AffineTransform getTransform(){

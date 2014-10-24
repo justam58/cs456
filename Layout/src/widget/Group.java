@@ -12,8 +12,9 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import view.Layout;
 
-public class Group extends SOReflect implements Drawable, Selectable, Interactable {
+public class Group extends SOReflect implements Drawable, Selectable, Interactable, Layout {
 	
 	// Group{ contents:[ ... ], sx:1.0, sy:1.0, rotate:0.0, tx:0.0, ty:0.0 } 
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
@@ -22,6 +23,10 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 	public double rotate; // in degrees counter clockwise.
 	public double tx;
 	public double ty;
+	
+	// Group{ contents:[...], width:10.0, height:20.0 }
+	public double width;
+	public double height;
 	
 	@Override
 	public void setStyle(SO style){
@@ -133,14 +138,6 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 
 	@Override
 	public boolean key(char key) {
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			// recursively call select on its contents
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.key(key);
-			if(handeled){
-				return true;
-			}
-		}
 		return false;
 	}
 
@@ -152,6 +149,48 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 		}
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
+	}
+
+	@Override
+	public double getMinWidth() {
+		return width;
+	}
+
+	@Override
+	public double getDesiredWidth() {
+		return width;
+	}
+
+	@Override
+	public double getMaxWidth() {
+		return Double.MAX_VALUE;
+	}
+
+	@Override
+	public void setHBounds(double left, double right) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getMinHeight() {
+		return height;
+	}
+
+	@Override
+	public double getDesiredHeight() {
+		return height;
+	}
+
+	@Override
+	public double getMaxHeight() {
+		return Double.MAX_VALUE;
+	}
+
+	@Override
+	public void setVBounds(double top, double bottom) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

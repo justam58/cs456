@@ -10,11 +10,12 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import view.Layout;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class Button extends SOReflect implements Drawable, Interactable {
+public class Button extends SOReflect implements Drawable, Interactable, Layout {
 	
 	// Button{ label:"my label", contents:[...],state:"idle", idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], value:10 } 
 	public String label;
@@ -124,13 +125,13 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public void setStyle(SO style) {
-		SA contentsArray = style.getArray("contents");
-		for(int i = 0; i < contentsArray.size(); i++){
-			SO shapeObj = contentsArray.getSO(i);
-			Drawable shape = (Drawable)shapeObj;
-			shape.setStyle(shapeObj);
-			contents.add(shape);
-		}
+//		SA contentsArray = style.getArray("contents");
+//		for(int i = 0; i < contentsArray.size(); i++){
+//			SO shapeObj = contentsArray.getSO(i);
+//			Drawable shape = (Drawable)shapeObj;
+//			shape.setStyle(shapeObj);
+//			contents.add(shape);
+//		}
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -190,6 +191,54 @@ public class Button extends SOReflect implements Drawable, Interactable {
 		for(int i = 0; i < contents.size(); i++){
 			contents.get(i).paint(g);
 		}
+	}
+
+	@Override
+	public double getMinWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setHBounds(double left, double right) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getMinHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setVBounds(double top, double bottom) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

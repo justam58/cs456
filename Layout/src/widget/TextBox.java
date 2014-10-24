@@ -11,13 +11,14 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import view.Layout;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class TextBox extends SOReflect implements Interactable, Drawable, ModelListener {
+public class TextBox extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
 	
-	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...] }
+	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], desiredChars:10 }
 	public String label;
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
 	public ArrayList<String> models = new ArrayList<String>(); 
@@ -27,6 +28,8 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 	public Color active;
 	public boolean edit;
 	public double cursor = -1;
+	
+	public double desiredChars;
 	
 	private Text textContent;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
@@ -190,6 +193,54 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 		if(textContent.text != newValue){
 			textContent.text = newValue;
 		}
+	}
+
+	@Override
+	public double getMinWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setHBounds(double left, double right) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getMinHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setVBounds(double top, double bottom) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

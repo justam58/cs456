@@ -1,6 +1,9 @@
 package view;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -36,6 +39,7 @@ public class ContentPanel extends JPanel {
 		this.addMouseListener(mouseListener);
 		this.addMouseMotionListener(mouseMotionListner);
 		this.addKeyListener(keyListener);
+		this.addComponentListener(componentListner);
 		repaint();
 	}
 	
@@ -44,6 +48,7 @@ public class ContentPanel extends JPanel {
 		this.removeMouseListener(mouseListener);
 		this.removeMouseMotionListener(mouseMotionListner);
 		this.removeKeyListener(keyListener);
+		this.removeComponentListener(componentListner);
 		painted = false;
 		repaint();
 	}
@@ -111,6 +116,31 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void keyReleased(KeyEvent e) {
+			// do nothing
+		}
+    	
+    };
+    
+    private ComponentListener componentListner = new ComponentListener(){
+
+		@Override
+		public void componentResized(ComponentEvent e) {
+			Component c = e.getComponent();
+			root.resize(c.getWidth(), c.getHeight());
+		}
+
+		@Override
+		public void componentMoved(ComponentEvent e) {
+			// do nothing
+		}
+
+		@Override
+		public void componentShown(ComponentEvent e) {
+			// do nothing
+		}
+
+		@Override
+		public void componentHidden(ComponentEvent e) {
 			// do nothing
 		}
     	

@@ -12,12 +12,13 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import view.Layout;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
 
-public class ScrollV extends SOReflect implements Interactable, Drawable, ModelListener {
+public class ScrollV extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
@@ -290,6 +291,53 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 		if(modelValue != slider.getCurrentY()){
 			slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
 		}
+	}
+
+	@Override
+	public double getMinWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setHBounds(double left, double right) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public double getMinHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDesiredHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaxHeight() {
+		return Double.MAX_VALUE;
+	}
+
+	@Override
+	public void setVBounds(double top, double bottom) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
