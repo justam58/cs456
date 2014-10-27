@@ -56,7 +56,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
 		}
 		setBoundingBox((Graphics2D)g);
-		fontMetrics = g.getFontMetrics(new Font(this.font,Font.PLAIN,(int)size));
+		setFontMetrics((Graphics2D)g);
 
 //		g.drawRect((int)boundingBox.getX(), (int)boundingBox.getY(), (int)boundingBox.getWidth(), (int)boundingBox.getHeight());
 	}
@@ -89,7 +89,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return result;
 	}
 	
-	private void setBoundingBox(Graphics2D g){
+	public void setBoundingBox(Graphics2D g){
 		AffineTransform t = g.getTransform();
 		g.setTransform(new AffineTransform());
 		Font font = new Font(this.font,Font.PLAIN,(int)size);
@@ -98,6 +98,10 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	            0, text.length(), Font.LAYOUT_LEFT_TO_RIGHT);
         boundingBox = gv.getPixelBounds(g.getFontRenderContext(), (float)x, (float)y);
         g.setTransform(t);
+	}
+	
+	public void setFontMetrics(Graphics2D g){
+		fontMetrics = g.getFontMetrics(new Font(this.font,Font.PLAIN,(int)size));
 	}
 
 	@Override
@@ -109,7 +113,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		if(edit){
 			ArrayList<Integer> selectedPath = select(x,y,0,myTransform);
 			if(selectedPath != null){
-				editing(x);
+				editing(x, false);
 				return true;
 			}
 			cursor = -1;
@@ -137,9 +141,14 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return textWithCursor.length();
 	}
 
-	public void editing(double x){
+	public void editing(double x, boolean knowCursor){
 		root.setKeyFocus(this);
-		this.cursor = calculateCursor(x);
+		if(!knowCursor){
+			this.cursor = calculateCursor(x);
+		}
+		else{
+			cursor = x;
+		}
 		root.repaint();
 	}
 
