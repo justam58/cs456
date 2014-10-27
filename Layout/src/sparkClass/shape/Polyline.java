@@ -33,6 +33,14 @@ public class Polyline extends SOReflect implements Drawable, Selectable, Interac
 		this.yPoints = yPoints;
 		this.thickness = thickness;
 	}
+	
+	public void setXPoints(int[] xPoints){
+		this.xPoints = xPoints;
+	}
+	
+	public void setYPoints(int[] yPoints){
+		this.yPoints = yPoints;
+	}
 
 	@Override
 	public void setStyle(SO style) {

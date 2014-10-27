@@ -1,7 +1,6 @@
 package sparkClass.widget;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -10,13 +9,11 @@ import listener.ActiveListener;
 import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
-import spark.data.SOReflect;
 import sparkClass.Group;
 import sparkClass.Root;
 import sparkClass.shape.Line;
 import sparkClass.shape.Rect;
 import sparkClass.shape.Polyline;
-import sparkClass.shape.Text;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
@@ -45,6 +42,12 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	private double sliderHeight;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
+	
+	private Selectable upper;
+	private Selectable downer;
+	private Rect activer;
+	private double barWidth = 10;
+	private double margin = 2;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size();i++){
@@ -114,11 +117,11 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 		
 		root = getPanel();
 
-		Rect rectActive = new Rect(0,0,10,100);
-		Rect rectRange = new Rect(0,10,10,80);
-		Rect rectSlide = new Rect(0,10,10,20);
-		Polyline arrowUp = new Polyline(new int[]{2,5,8},new int[]{8,2,8},3);
-		Polyline arrowDown = new Polyline(new int[]{2,5,8},new int[]{92,98,92},3);
+		Rect rectActive = new Rect(0,0,barWidth,100);
+		Rect rectRange = new Rect(0,barWidth,barWidth,80);
+		Rect rectSlide = new Rect(0,barWidth,barWidth,barWidth);
+		Polyline arrowUp = new Polyline(new int[]{(int) margin,(int) (barWidth/margin),(int) (barWidth-margin)},new int[]{(int) (barWidth-margin),(int) margin,(int) (barWidth-margin)},3);
+		Polyline arrowDown = new Polyline(new int[]{(int) margin,(int) (barWidth/2),(int) (barWidth-margin)},new int[]{92,98,92},3);
 		
 		contents.add(rectActive);
 		contents.add(rectRange);
@@ -144,6 +147,10 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 		slider = dragableSlider;
 		sliderHeight = slider.getSliderHeight();
 		setSliderMaxAndMin();
+		
+		upper = (Selectable)arrowUp;
+		downer = (Selectable)arrowDown;
+		activer = rectActive;
 		
 		Object value = root.model.getValue(models, root.model, 0);
 		if(value != null){
@@ -186,9 +193,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 				ArrayList<Integer> selectPath = content.select(x, y, i, myTransform);
 				if(selectPath != null){
 					updateState(true, false);
-					SOReflect shape = (SOReflect)content;
-					String classVal = shape.getString("class");
-					if(classVal != null && classVal.equals("slide")){
+					if(content.equals((Selectable)slider)){
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
@@ -238,9 +243,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
 				if(selectPath != null){
 					updateState(false, true);
-					SOReflect shape = (SOReflect)content;
-					String classVal = shape.getString("class");
-					if(classVal != null && classVal.equals("up") && models.size() > 0){
+					if(content.equals((Selectable)upper) && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)+step;
 						if(newValue > max){
@@ -249,7 +252,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
 						slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 					}
-					else if(classVal != null && classVal.equals("down") && models.size() > 0){
+					else if(content.equals((Selectable)downer) && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)-step;
 						if(newValue < min){
@@ -280,38 +283,33 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public double getMinWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public double getDesiredWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public double getMaxWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public void setHBounds(double left, double right) {
-		this.left = left;
-		this.right = right;
+		activer.left = left;
+		activer.width = barWidth;
 	}
 
 	@Override
 	public double getMinHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 50;
 	}
 
 	@Override
 	public double getDesiredHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 100;
 	}
 
 	@Override
@@ -321,13 +319,26 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		this.top = top;
-		this.bottom = bottom;
-	}
-	
-	@Override
-	public void paint(Graphics g){
+		double height = bottom-top;
+		activer.top = top;
+		activer.height = height;
 		
+		Rect rangerRect = (Rect)ranger;
+		rangerRect.top = top+barWidth;
+		rangerRect.height = height - barWidth*2;
+		
+		Polyline arrowUp = (Polyline)upper;
+		arrowUp.setYPoints(new int[]{(int) (top+barWidth-margin),(int) (top+margin),(int) (top+barWidth-margin)});
+		Polyline arrowDown = (Polyline)downer;
+		arrowDown.setYPoints(new int[]{(int) (bottom-barWidth+margin), (int) (bottom-margin), (int) (bottom-barWidth+margin)});
+		
+		setSliderMaxAndMin();
+		
+		Object value = root.model.getValue(models, root.model, 0);
+		if(value != null){
+			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+		}
 	}
 
 }
