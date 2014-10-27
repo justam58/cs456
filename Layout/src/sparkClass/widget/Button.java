@@ -8,16 +8,14 @@ import java.util.ArrayList;
 import listener.ActiveListener;
 import spark.data.SA;
 import spark.data.SO;
-import spark.data.SOReflect;
-import spark.data.SParented;
+import sparkClass.Group;
 import sparkClass.Root;
-import sparkClass.shape.Text;
 import able.Drawable;
 import able.Interactable;
 import able.Layout;
 import able.Selectable;
 
-public class Button extends SOReflect implements Drawable, Interactable, Layout {
+public class Button extends Group implements Drawable, Interactable, Layout {
 	
 	// Button{ label:"my label", contents:[...],state:"idle", idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], value:10 } 
 	public String label;
@@ -31,6 +29,11 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 	
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
+	
+	private double top;
+	private double bottom;
+	private double left;
+	private double right;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -111,21 +114,6 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 	}
 	
 	@Override
-	public boolean key(char key) {
-		return false;
-	}
-	
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
-	}
-	
-	@Override
 	public void setStyle(SO style) {
 //		SA contentsArray = style.getArray("contents");
 //		for(int i = 0; i < contentsArray.size(); i++){
@@ -189,13 +177,6 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 	}
 	
 	@Override
-	public void paint(Graphics g) {
-		for(int i = 0; i < contents.size(); i++){
-			contents.get(i).paint(g);
-		}
-	}
-
-	@Override
 	public double getMinWidth() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -215,8 +196,8 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-		
+		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -239,7 +220,12 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		// TODO Auto-generated method stub
+		this.top = top;
+		this.bottom = bottom;
+	}
+	
+	@Override
+	public void paint(Graphics g){
 		
 	}
 

@@ -32,9 +32,21 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	public double cursor = -1;
 	public ArrayList<String> models = null; 
 	
-	public Rectangle boundingBox = null;
+	private Rectangle boundingBox = null;
 	private FontMetrics fontMetrics;
-	private Root root = null;
+	public Root root = null;
+
+	public Text(String text, double x, double y, String font, double size, boolean edit, double cursor, ArrayList<String> models) {
+		super();
+		this.text = text;
+		this.x = x;
+		this.y = y;
+		this.font = font;
+		this.size = size;
+		this.edit = edit;
+		this.cursor = cursor;
+		this.models = models;
+	}
 
 	@Override
 	public void setStyle(SO style) {
@@ -57,7 +69,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 			g.drawChars(text.toCharArray(), 0, text.length(), (int)x, (int)y);
 		}
 		setBoundingBox((Graphics2D)g);
-		fontMetrics = g.getFontMetrics(new Font(this.font,Font.PLAIN,(int)size));
+		setFontMetrics((Graphics2D)g);
 
 //		g.drawRect((int)boundingBox.getX(), (int)boundingBox.getY(), (int)boundingBox.getWidth(), (int)boundingBox.getHeight());
 	}
@@ -90,7 +102,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return result;
 	}
 	
-	private void setBoundingBox(Graphics2D g){
+	public void setBoundingBox(Graphics2D g){
 		AffineTransform t = g.getTransform();
 		g.setTransform(new AffineTransform());
 		Font font = new Font(this.font,Font.PLAIN,(int)size);
@@ -100,6 +112,12 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
         boundingBox = gv.getPixelBounds(g.getFontRenderContext(), (float)x, (float)y);
         g.setTransform(t);
 	}
+	
+	public FontMetrics setFontMetrics(Graphics2D g){
+		fontMetrics = g.getFontMetrics(new Font(this.font,Font.PLAIN,(int)size));
+		return fontMetrics;
+	}
+
 
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
@@ -110,7 +128,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		if(edit){
 			ArrayList<Integer> selectedPath = select(x,y,0,myTransform);
 			if(selectedPath != null){
-				editing(x);
+				editing(x,false);
 				return true;
 			}
 			cursor = -1;
@@ -138,9 +156,14 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		return textWithCursor.length();
 	}
 
-	public void editing(double x){
+	public void editing(double x, boolean knowCursor){
 		root.setKeyFocus(this);
-		this.cursor = calculateCursor(x);
+		if(!knowCursor){
+			this.cursor = calculateCursor(x);
+		}
+		else{
+			cursor = x;
+		}
 		root.repaint();
 	}
 

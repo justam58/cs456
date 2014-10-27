@@ -46,9 +46,11 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	}
 	
 	public void resize(double width, double height){
-		System.out.println(width + ", " + height);
+//		System.out.println(width + ", " + height);
 		Layout layout = (Layout)content;
-		// TODO which method to call
+		layout.setHBounds(0, width);
+		layout.setVBounds(0, height);
+		repaint();
 	}
 	
 	private AffineTransform getTransform(){
@@ -69,6 +71,7 @@ public class Root extends SOReflect implements Drawable, Interactable {
 		Drawable shape = (Drawable)contentsObj;
 		shape.setStyle(contentsObj);
 		content = shape;
+		resize(800,600);
 	}
 	
 	private TreeNode build(TreeNode current, String name, SV value){

@@ -1,7 +1,9 @@
 package sparkClass.widget;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
@@ -9,16 +11,16 @@ import listener.ActiveListener;
 import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
-import spark.data.SOReflect;
-import spark.data.SParented;
+import sparkClass.Group;
 import sparkClass.Root;
+import sparkClass.shape.Rect;
 import sparkClass.shape.Text;
 import able.Drawable;
 import able.Interactable;
 import able.Layout;
 import able.Selectable;
 
-public class TextBox extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
+public class TextBox extends Group implements Interactable, Drawable, ModelListener, Layout {
 	
 	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], desiredChars:10 }
 	public String label;
@@ -33,9 +35,14 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 	
 	public double desiredChars;
 	
-//	private Text textContent;
+	private Text textContent;
+	private Rect textBox;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
+	
+	private FontMetrics fontMetrics;
+	private double marginWidth = 10;
+	private double marginHeight = 5;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -63,13 +70,38 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 
 	@Override
 	public void setStyle(SO style) {
-//		SA contentsArray = style.getArray("contents");
-//		for(int i = 0; i < contentsArray.size(); i++){
-//			SO shapeObj = contentsArray.getSO(i);
-//			Drawable shape = (Drawable)shapeObj;
-//			shape.setStyle(shapeObj);
-//			contents.add(shape);
-//		}
+		
+		SA modelsObj = style.getArray("model");
+		if(modelsObj != null){
+			for(int i = 0; i < modelsObj.size(); i++){
+				models.add(modelsObj.get(i).toString().replace("\"", ""));
+			}
+		}
+		
+		root = getPanel();
+		
+		Rect rect = new Rect(0,0,200,30);
+		Text text = new Text(root.model.getValue(models, root.model, 0),110,320,"serif",15,edit,cursor,models);
+		contents.add(rect);
+		contents.add(text);
+		textBox = rect;
+		textContent = text;
+		textContent.root = root;
+		
+		root.model.addListener(models, root.model, 0, this);
+		ActiveListener listener = (ActiveListener)rect;
+		listeners.add(listener);
+		
+		if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
+		
+		if(state.equals("active")){
+			updateState(true, false);
+			if(edit){
+				textContent.editing(cursor, true);
+			}
+		}
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -95,42 +127,6 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 			active = new Color(r, g, b);
 		}
 		
-		SA modelsObj = style.getArray("model");
-		if(modelsObj != null){
-			for(int i = 0; i < modelsObj.size(); i++){
-				models.add(modelsObj.get(i).toString().replace("\"", ""));
-			}
-		}
-		
-		root = getPanel();
-		root.model.addListener(models, root.model, 0, this);
-				
-//		for(int j = 0; j < contents.size(); j++){
-//			SOReflect shape = (SOReflect)contents.get(j);
-//			String classVal = shape.getString("class");
-//			if(classVal != null && classVal.equals("active")){
-//				ActiveListener listener = (ActiveListener)shape;
-//				listeners.add(listener);
-//				if(state.equals("idle")){
-//					listener.stateChanged(idle);
-//				}
-//			}
-//			if(classVal != null && classVal.equals("content")){
-//				textContent = (Text)shape;
-//				textContent.edit = this.edit;
-//				textContent.cursor = this.cursor;
-//				textContent.models = this.models;
-//				textContent.text = root.model.getValue(models, root.model, 0);
-//			}
-//		}
-		
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		for(int i = 0; i < contents.size(); i++){
-			contents.get(i).paint(g);
-		}
 	}
 
 	@Override
@@ -142,7 +138,7 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 				if(selectPath != null){
 					updateState(true, false);
 					if(edit){
-//						textContent.editing(x);
+						textContent.editing(x,false);
 					}
 					return true;
 				}
@@ -150,7 +146,7 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 		}
 		state = "idle";
 		updateState(false, false);
-//		textContent.cursor = -1;
+		textContent.cursor = -1;
 		return false;
 	}
 
@@ -176,73 +172,95 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 	}
 
 	@Override
-	public boolean key(char key) {
-		return false;
-	}
-
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
-	}
-
-	@Override
 	public void modelChanged(String newValue) {
-//		if(textContent.text != newValue){
-//			textContent.text = newValue;
-//		}
+		if(textContent.text != newValue){
+			textContent.text = newValue;
+		}
 	}
 
 	@Override
 	public double getMinWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		String wString = "";
+		for(int i = 0; i < desiredChars; i++){
+			wString += "W";
+		}
+		int stringWidth = fontMetrics.stringWidth(wString);
+		return stringWidth;
 	}
 
 	@Override
 	public double getDesiredWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		String wString = "";
+		for(int i = 0; i < desiredChars; i++){
+			wString += "W";
+		}
+		int stringWidth = fontMetrics.stringWidth(wString);
+		return stringWidth+marginWidth*2;
 	}
 
 	@Override
 	public double getMaxWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.MAX_VALUE;
 	}
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-		
+		double width = right-left;
+		textBox.left = left;
+		textBox.width = width;
+		int contentWidth = fontMetrics.stringWidth(textContent.text);
+		if(contentWidth > width){
+			// TODO what?
+			System.out.println("what?");
+			System.out.println(contentWidth);
+			System.out.println(width);
+		}
+		else{
+			double spaceLeft = width - contentWidth;
+			System.out.println(left);
+			System.out.println(spaceLeft/2);
+			textContent.x = left + spaceLeft/2;
+		}
 	}
 
 	@Override
 	public double getMinHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.getHeight();
 	}
 
 	@Override
 	public double getDesiredHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.getHeight()+marginHeight*2;
 	}
 
 	@Override
 	public double getMaxHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.MAX_VALUE;
 	}
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		// TODO Auto-generated method stub
-		
+		double hegiht = bottom-top;
+		textBox.top = top;
+		textBox.height = hegiht;
+		int contentHeight = fontMetrics.getHeight();
+		if(contentHeight > hegiht){
+			// TODO what?
+		}
+		else{
+			double spaceLeft = hegiht - contentHeight;
+			textContent.y = top + spaceLeft/2;
+		}
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		for(int i = 0; i < contents.size(); i++){
+            contents.get(i).paint(g);
+		}
+		Graphics2D g2d = (Graphics2D)g;
+		fontMetrics = textContent.setFontMetrics(g2d);
+		textContent.setBoundingBox(g2d);
 	}
 
 }

@@ -1,29 +1,23 @@
 package sparkClass.layout;
 
-import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
-
 import able.Drawable;
 import able.Interactable;
 import able.Layout;
-import spark.data.SA;
-import spark.data.SO;
-import spark.data.SOReflect;
-import spark.data.SParented;
-import sparkClass.Root;
+import sparkClass.Group;
 
-public class VStack extends SOReflect implements Layout, Drawable, Interactable {
+public class VStack extends Group implements Layout, Drawable, Interactable {
 	
 	// VStack{ contents:[...] }
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
 
 	@Override
 	public double getMinWidth() {
 		double result = 0;
 		for(int i = 0; i < contents.size(); i++){
 			Layout layout = (Layout)contents.get(i);
-			result += layout.getMinWidth();
+			double childMinWidth = layout.getMinWidth();
+			if(result < childMinWidth){
+				result = childMinWidth;
+			}
 		}
 		return result;
 	}
@@ -33,7 +27,10 @@ public class VStack extends SOReflect implements Layout, Drawable, Interactable 
 		double result = 0;
 		for(int i = 0; i < contents.size(); i++){
 			Layout layout = (Layout)contents.get(i);
-			result += layout.getDesiredWidth();
+			double childDesiredWidth = layout.getDesiredWidth();
+			if(result < childDesiredWidth){
+				result = childDesiredWidth;
+			}
 		}
 		return result;
 	}
@@ -43,15 +40,20 @@ public class VStack extends SOReflect implements Layout, Drawable, Interactable 
 		double result = 0;
 		for(int i = 0; i < contents.size(); i++){
 			Layout layout = (Layout)contents.get(i);
-			result += layout.getMaxWidth();
+			double childMaxWidth = layout.getMaxWidth();
+			if(result < childMaxWidth){
+				result = childMaxWidth;
+			}
 		}
 		return result;
 	}
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-
+		for(int i = 0; i < contents.size(); i++){
+			Layout child = (Layout)contents.get(i);
+			child.setHBounds(left, right);
+		}
 	}
 
 	@Override
@@ -86,77 +88,48 @@ public class VStack extends SOReflect implements Layout, Drawable, Interactable 
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		boolean handled = false;
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable shape = (Interactable)contents.get(i);
-			boolean shapeHandled = shape.mouseDown(x,y,myTransform);
-			if(!handled && shapeHandled){
-				handled = true;
+		double min = getMinHeight();
+		double max = getMaxHeight();
+		double desired = getDesiredHeight();
+		double height = bottom-top;
+		
+		if(min >= height){
+			// give all children their min and let them be clipped
+			double childTop = top;
+			for(int i = 0; i < contents.size(); i++){
+				Layout child = (Layout)contents.get(i);
+				double childHeight = child.getMinHeight();
+				child.setVBounds(childTop, childTop+childTop);
+				childTop += childHeight;
 			}
 		}
-		return handled;
-	}
-
-	@Override
-	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.mouseMove(x, y, myTransform);
-			if(handeled){
-				return true;
+		else if(desired >= height){
+			// give min to all and proportional on what is available for desired
+			double desiredMargin = desired-min;
+			double fraction = (height-min)/desiredMargin;
+			double childTop = top;
+			for(int i = 0; i < contents.size(); i++){
+				Layout child = (Layout)contents.get(i);
+				double childMinHeight = child.getMinHeight();
+				double childDesiredHeight = child.getDesiredHeight();
+				double childHeight = childMinHeight+(childDesiredHeight-childMinHeight)*fraction;
+				child.setHBounds(childTop, childTop+childHeight);
+				childTop += childHeight;
 			}
 		}
-		return false;
-	}
-
-	@Override
-	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.mouseUp(x, y, myTransform);
-			if(handeled){
-				return true;
+		else{
+			// allocate what remains based on max width
+			double maxMargin = max-desired;
+			double fraction = (height-desired)/maxMargin;
+			double childTop = top;
+			for(int i = 0; i < contents.size(); i++){
+				Layout child = (Layout)contents.get(i);
+				double childDesiredHeight = child.getDesiredHeight();
+				double childMaxHeight = child.getMaxHeight();
+				double childHeight = childDesiredHeight+(childMaxHeight-childDesiredHeight)*fraction;
+				child.setHBounds(childTop, childTop+childHeight);
+				childTop += childHeight;
 			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean key(char key) {
-		return false;
-	}
-
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
-	}
-
-	@Override
-	public void setStyle(SO style) {
-		SA contentsArray = style.getArray("contents");
-		for(int i = 0; i < contentsArray.size(); i++){
-			SO shapeObj = contentsArray.getSO(i);
-			Drawable shape = (Drawable)shapeObj;
-			shape.setStyle(shapeObj);
-			contents.add(shape);
-		}
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		for(int i = 0; i < contents.size(); i++){
-            contents.get(i).paint(g);
 		}
 	}
 

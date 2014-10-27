@@ -1,7 +1,5 @@
 package sparkClass.layout;
 
-import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import able.Drawable;
@@ -10,19 +8,21 @@ import able.Layout;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
-import spark.data.SParented;
-import sparkClass.Root;
+import sparkClass.Group;
 
-public class Columns extends SOReflect implements Layout, Drawable, Interactable {
+public class Columns extends Group implements Layout, Drawable, Interactable {
 	
 	// Columns{ contents:[...], nColumns:12, gutter:10 }
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
 	public double nColumns;
 	public double gutter;
 	
 	private double minWidth;
 	private double maxWidth;
 	private double desiredWidth;
+	
+	private ArrayList<Double> columnSpan = new ArrayList<Double>();
+	private ArrayList<ArrayList<Layout>> childRows = new ArrayList<ArrayList<Layout>>();
+	private ArrayList<Layout> currentRow = new ArrayList<Layout>();	
 
 	@Override
 	public double getMinWidth() {
@@ -41,8 +41,47 @@ public class Columns extends SOReflect implements Layout, Drawable, Interactable
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-
+		childRows = new ArrayList<ArrayList<Layout>>();
+		currentRow = new ArrayList<Layout>();
+		// When Columns receives its width range it will compute a column width of (width-(nColumns-1)*gutter)/nColumns). 
+		// Using this width, it will lay out all of its children in rows, giving each the width specified by its columnSpan attribute.  
+		double width = right-left;
+		double columnWidth = (width-(nColumns-1)*gutter)/nColumns;
+		double columnsLeft = nColumns;
+		for(int i = 0; i < contents.size(); i++){
+			Layout child = (Layout)contents.get(i);
+			double childMinWidth = child.getMinWidth();
+			double columnsNeeded = Math.ceil(childMinWidth/columnWidth);
+			// If the total width is not enough then that child is given a row of its own and all the columns in that row. 
+			if(nColumns < columnsNeeded){
+				nextRow();
+				currentRow.add(child);
+				nextRow();
+				child.setHBounds(left,right);
+				columnsLeft = nColumns;
+				continue;
+			}
+			// If the column width is less than the minimum for some child, then it is given more columns until it has enough.
+			// If it has more children than fit in nColumns it will wrap them onto new rows. 
+			if(columnsLeft < columnsNeeded){
+				nextRow();
+				currentRow.add(child);
+				child.setHBounds(left,columnWidth*columnsNeeded);
+				columnsLeft = nColumns - columnsNeeded;
+			}
+			else{
+				currentRow.add(child);
+				double currentLeft = right-columnWidth*columnsLeft;
+				child.setHBounds(currentLeft,currentLeft+columnWidth*columnsNeeded);
+				columnsLeft -= columnsNeeded;
+			}
+		}
+		// It will now know how many rows it needs and which children are in each row.
+	}
+	
+	private void nextRow(){
+		childRows.add(currentRow);
+		currentRow = new ArrayList<Layout>();
 	}
 
 	@Override
@@ -77,60 +116,18 @@ public class Columns extends SOReflect implements Layout, Drawable, Interactable
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		boolean handled = false;
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable shape = (Interactable)contents.get(i);
-			boolean shapeHandled = shape.mouseDown(x,y,myTransform);
-			if(!handled && shapeHandled){
-				handled = true;
+		// When it gets its height bounds, it will use the min,desired, and max values for the children in each row to determine how much of the vertical space to give to each row. 
+		// This is then set as the height for each object in a row.
+		double currentTop = top;
+		for(int i = 0; i < childRows.size(); i++){
+			ArrayList<Layout> children = childRows.get(i);
+			double rowHeight = 0; //TODO
+			for(int j = 0; j < children.size(); j++){
+				Layout child = children.get(j);
+				child.setVBounds(currentTop, currentTop+rowHeight);
 			}
+			currentTop += rowHeight;
 		}
-		return handled;
-	}
-
-	@Override
-	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.mouseMove(x, y, myTransform);
-			if(handeled){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){ // back to front order
-			Interactable content = (Interactable)contents.get(i);
-			boolean handeled = content.mouseUp(x, y, myTransform);
-			if(handeled){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean key(char key) {
-		return false;
-	}
-
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
 	}
 
 	@Override
@@ -151,6 +148,7 @@ public class Columns extends SOReflect implements Layout, Drawable, Interactable
 			if(classVal != null && classVal.equals("columnSpan")){
 				columnSpan = Double.valueOf(classVal);
 			}
+			this.columnSpan.add(columnSpan);
 			
 			Layout layout = (Layout)shape;
 			double minColumnWidth = computeColumnWidth(layout.getMinWidth(),columnSpan);
@@ -172,13 +170,6 @@ public class Columns extends SOReflect implements Layout, Drawable, Interactable
 		desiredWidth = computeWidth(maxDesiredColumnWidth);
 	}
 
-	@Override
-	public void paint(Graphics g) {
-		for(int i = 0; i < contents.size(); i++){
-            contents.get(i).paint(g);
-		}
-	}
-	
 	private double computeColumnWidth(double width, double columnSpan){
 		return (width-((columnSpan-1)*gutter))/columnSpan;
 	}

@@ -31,6 +31,14 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	
 	private static final int HIT_BOX_SIZE = 3;
 
+	public Rect(double left, double top, double width, double height) {
+		super();
+		this.left = left;
+		this.top = top;
+		this.width = width;
+		this.height = height;
+	}
+
 	@Override
 	public void setStyle(SO style){
 		SO borderObj = style.getObj("border");

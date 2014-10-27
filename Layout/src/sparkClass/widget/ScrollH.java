@@ -11,7 +11,7 @@ import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
-import spark.data.SParented;
+import sparkClass.Group;
 import sparkClass.Root;
 import sparkClass.shape.Line;
 import sparkClass.shape.Rect;
@@ -21,7 +21,7 @@ import able.Interactable;
 import able.Layout;
 import able.Selectable;
 
-public class ScrollH extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
+public class ScrollH extends Group implements Interactable, Drawable, ModelListener, Layout {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
@@ -43,6 +43,11 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 	private double sliderWidth;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
+	
+	private double top;
+	private double bottom;
+	private double left;
+	private double right;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -178,13 +183,6 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		for(int i = 0; i < contents.size(); i++){
-			contents.get(i).paint(g);
-		}
-	}
-
-	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
 		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
@@ -272,21 +270,6 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 		state = "idle";
 		return false;
 	}
-
-	@Override
-	public boolean key(char key) {
-		return false;
-	}
-
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
-	}
 	
 	@Override
 	public void modelChanged(String newValue) {
@@ -318,8 +301,8 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-		
+		this.left = left;
+		this.right = right;
 	}
 
 	@Override
@@ -342,7 +325,12 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		// TODO Auto-generated method stub
+		this.top = top;
+		this.bottom = bottom;
+	}
+	
+	@Override
+	public void paint(Graphics g){
 		
 	}
 
