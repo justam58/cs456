@@ -1,7 +1,2 @@
-/layout
-/shape
-/widget
-/able
-/model
-/view
-/sparkClass
+/sparkClass/
+/view/

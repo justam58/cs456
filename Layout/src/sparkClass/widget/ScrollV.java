@@ -15,6 +15,8 @@ import sparkClass.Group;
 import sparkClass.Root;
 import sparkClass.shape.Line;
 import sparkClass.shape.Rect;
+import sparkClass.shape.Polyline;
+import sparkClass.shape.Text;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
@@ -43,11 +45,6 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	private double sliderHeight;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
-	
-	private double top;
-	private double bottom;
-	private double left;
-	private double right;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size();i++){
@@ -101,13 +98,59 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	
 	@Override
 	public void setStyle(SO style) {
-//		SA contentsArray = style.getArray("contents");
-//		for(int i = 0; i < contentsArray.size(); i++){
-//			SO shapeObj = contentsArray.getSO(i);
-//			Drawable shape = (Drawable)shapeObj;
-//			shape.setStyle(shapeObj);
-//			contents.add(shape);
-//		}
+//		Rect{ class:"active", left:10,top:10, width:20, height:190, fill:{r:255,g:255,b:255}},
+//		Rect{ class:"range", left:10, top:32, width:20, height:130, fill:{r:200,g:200,b:200} },
+//		Polyline{ class:"up", points:[{x:12,y:30},{x:20,y:12},{x:28,y:30}], color:{r:0,g:0,b:0}, thickness: 3 },
+//		Polyline{ class:"down", points:[{x:12,y:170},{x:20,y:198},{x:28,y:170}], color:{r:0,g:0,b:0}, thickness: 3 },
+//		Rect{ class:"slide", left:10, top:100, width:20, height:30,fill:{r:0,g:0,b:0} }
+		
+		
+		SA modelsObj = style.getArray("model");
+		if(modelsObj != null){
+			for(int i = 0; i < modelsObj.size(); i++){
+				models.add(modelsObj.get(i).toString().replace("\"", ""));
+			}
+		}
+		
+		root = getPanel();
+
+		Rect rectActive = new Rect(0,0,10,100);
+		Rect rectRange = new Rect(0,10,10,80);
+		Rect rectSlide = new Rect(0,10,10,20);
+		Polyline arrowUp = new Polyline(new int[]{2,5,8},new int[]{8,2,8},3);
+		Polyline arrowDown = new Polyline(new int[]{2,5,8},new int[]{92,98,92},3);
+		
+		contents.add(rectActive);
+		contents.add(rectRange);
+		contents.add(rectSlide);
+		contents.add(arrowUp);
+		contents.add(arrowDown);
+		
+		root.model.addListener(models, root.model, 0, this);
+		ActiveListener listener = (ActiveListener)rectActive;
+		listeners.add(listener);
+		
+		if(state.equals("active")){
+			listener.stateChanged(active);
+		}
+		else if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
+		
+		Interactable rangerShape = (Interactable)rectRange;
+		ranger = rangerShape;
+		
+		Dragable dragableSlider = (Dragable)rectSlide;
+		slider = dragableSlider;
+		sliderHeight = slider.getSliderHeight();
+		setSliderMaxAndMin();
+		
+		Object value = root.model.getValue(models, root.model, 0);
+		if(value != null){
+			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+		}
+		
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -132,53 +175,6 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 			int b = (int)activeObj.getDouble("b");
 			active = new Color(r, g, b);
 		}
-		
-		SA modelsObj = style.getArray("model");
-		if(modelsObj != null){
-			for(int i = 0; i < modelsObj.size(); i++){
-				models.add(modelsObj.get(i).toString().replace("\"", ""));
-			}
-		}
-		
-//		for(int j = 0; j < contents.size(); j++){
-//			SOReflect shape = (SOReflect)contents.get(j);
-//			String classVal = shape.getString("class");
-//			if(classVal != null && classVal.equals("active")){
-//				ActiveListener listener = (ActiveListener)shape;
-//				listeners.add(listener);
-//				if(state.equals("active")){
-//					listener.stateChanged(active);
-//				}
-//				else if(state.equals("idle")){
-//					listener.stateChanged(idle);
-//				}
-//			}
-//			if(classVal != null && classVal.equals("range")){
-//				Interactable rangerShape = (Interactable)shape;
-//				ranger = rangerShape;
-//			}
-//			if(classVal != null && classVal.equals("slide")){
-//				Dragable dragableSlider = (Dragable)shape;
-//				slider = dragableSlider;
-//				sliderHeight = slider.getSliderHeight();
-//				setSliderMaxAndMin();
-//			}
-//		}
-		
-		root = getPanel();
-		root.model.addListener(models, root.model, 0, this);
-		
-//		for(int j = 0; j < contents.size(); j++){
-//			SOReflect shape = (SOReflect)contents.get(j);
-//			String classVal = shape.getString("class");
-//			if(classVal != null && classVal.equals("slide")){
-//				Object value = root.model.getValue(models, root.model, 0);
-//				if(value != null){
-//					double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
-//					slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
-//				}
-//			}
-//		}
 		
 	}
 

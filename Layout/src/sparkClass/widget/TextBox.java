@@ -81,7 +81,7 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		root = getPanel();
 		
 		Rect rect = new Rect(0,0,200,30);
-		Text text = new Text(root.model.getValue(models, root.model, 0),110,320,"serif",15,edit,cursor,models);
+		Text text = new Text(root.model.getValue(models, root.model, 0),10,25,"serif",15,edit,cursor,models);
 		contents.add(rect);
 		contents.add(text);
 		textBox = rect;
@@ -92,16 +92,6 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		ActiveListener listener = (ActiveListener)rect;
 		listeners.add(listener);
 		
-		if(state.equals("idle")){
-			listener.stateChanged(idle);
-		}
-		
-		if(state.equals("active")){
-			updateState(true, false);
-			if(edit){
-				textContent.editing(cursor, true);
-			}
-		}
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -125,6 +115,17 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 			int g = (int)activeObj.getDouble("g");
 			int b = (int)activeObj.getDouble("b");
 			active = new Color(r, g, b);
+		}
+		
+		if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
+		
+		if(state.equals("active")){
+			updateState(true, false);
+			if(edit){
+				textContent.editing(cursor, true);
+			}
 		}
 		
 	}
@@ -208,18 +209,19 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		double width = right-left;
 		textBox.left = left;
 		textBox.width = width;
+		System.out.println("textbox h " + left + ", " + width);
 		int contentWidth = fontMetrics.stringWidth(textContent.text);
 		if(contentWidth > width){
 			// TODO what?
-			System.out.println("what?");
-			System.out.println(contentWidth);
-			System.out.println(width);
 		}
 		else{
 			double spaceLeft = width - contentWidth;
-			System.out.println(left);
-			System.out.println(spaceLeft/2);
-			textContent.x = left + spaceLeft/2;
+			if(spaceLeft > (marginWidth*2)){
+				textContent.x = left + marginWidth;
+			}
+			else{
+				textContent.x = left + spaceLeft/2;
+			}
 		}
 	}
 
@@ -235,21 +237,24 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public double getMaxHeight() {
-		return Double.MAX_VALUE;
+		return fontMetrics.getHeight()+marginHeight*2;
 	}
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		double hegiht = bottom-top;
+		double height = bottom-top;
 		textBox.top = top;
-		textBox.height = hegiht;
+		textBox.height = height;
+		System.out.println("textbox v " + top + ", " + height);
 		int contentHeight = fontMetrics.getHeight();
-		if(contentHeight > hegiht){
+		System.out.println("contentHeight " + contentHeight);
+		if(contentHeight > height){
 			// TODO what?
 		}
 		else{
-			double spaceLeft = hegiht - contentHeight;
-			textContent.y = top + spaceLeft/2;
+			double spaceLeft = height - contentHeight;
+			System.out.println("spaceLeft " + spaceLeft);
+			textContent.y = bottom - spaceLeft/2;
 		}
 	}
 	

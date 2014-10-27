@@ -27,6 +27,13 @@ public class Polyline extends SOReflect implements Drawable, Selectable, Interac
 	
 	private static final int HIT_BOX_SIZE = 3;
 
+	public Polyline(int[] xPoints, int[] yPoints, double thickness) {
+		super();
+		this.xPoints = xPoints;
+		this.yPoints = yPoints;
+		this.thickness = thickness;
+	}
+
 	@Override
 	public void setStyle(SO style) {
 		SA pointsArray = style.getArray("points");

@@ -29,6 +29,7 @@ public class ContentPanel extends JPanel {
 	public Root root = null;
 	
 	private boolean painted = false;
+	private boolean initSize = false;
 	
 	public ContentPanel (){
 		super();
@@ -50,6 +51,7 @@ public class ContentPanel extends JPanel {
 		this.removeKeyListener(keyListener);
 		this.removeComponentListener(componentListner);
 		painted = false;
+		initSize = false;
 		repaint();
 	}
 	
@@ -153,6 +155,10 @@ public class ContentPanel extends JPanel {
 		if(root != null){
 			root.paint(g);
 			painted = true;
+			if(!initSize){
+				root.resize(getWidth(), getHeight());
+				initSize = true;
+			}
 		}
 	}
 }

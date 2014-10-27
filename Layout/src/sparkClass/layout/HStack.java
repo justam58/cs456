@@ -59,7 +59,13 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 		else if(desired >= width){
 			// give min to all and proportional on what is available for desired
 			double desiredMargin = desired-min;
-			double fraction = (width-min)/desiredMargin;
+			double fraction;
+			if(desiredMargin != 0){
+				fraction = (width-min)/desiredMargin;
+			}
+			else{
+				fraction = width-min;
+			}
 			double childLeft = left;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
@@ -73,7 +79,13 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 		else{
 			// allocate what remains based on max width
 			double maxMargin = max-desired;
-			double fraction = (width-desired)/maxMargin;
+			double fraction;
+			if(maxMargin != 0){
+				fraction = (width-desired)/maxMargin;
+			}
+			else{
+				fraction = width-desired;
+			}
 			double childLeft = left;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
