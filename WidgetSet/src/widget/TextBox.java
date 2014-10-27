@@ -119,6 +119,12 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 			}
 		}
 		
+		if(state.equals("active")){
+			updateState(true, false);
+			if(edit){
+				textContent.editing(cursor, true);
+			}
+		}		
 	}
 
 	@Override
@@ -137,7 +143,7 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 				if(selectPath != null){
 					updateState(true, false);
 					if(edit){
-						textContent.editing(x);
+						textContent.editing(x, false);
 					}
 					return true;
 				}
