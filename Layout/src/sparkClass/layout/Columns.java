@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.layout;
 
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
@@ -6,45 +6,37 @@ import java.util.ArrayList;
 
 import able.Drawable;
 import able.Interactable;
+import able.Layout;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import view.Layout;
+import sparkClass.Root;
 
-public class HStack extends SOReflect implements Layout, Drawable, Interactable {
+public class Columns extends SOReflect implements Layout, Drawable, Interactable {
 	
-	// HStack{ contents:[...] } 
+	// Columns{ contents:[...], nColumns:12, gutter:10 }
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
+	public double nColumns;
+	public double gutter;
+	
+	private double minWidth;
+	private double maxWidth;
+	private double desiredWidth;
 
 	@Override
 	public double getMinWidth() {
-		double result = 0;
-		for(int i = 0; i < contents.size(); i++){
-			Layout layout = (Layout)contents.get(i);
-			result += layout.getMinWidth();
-		}
-		return result;
+		return minWidth;
 	}
 
 	@Override
 	public double getDesiredWidth() {
-		double result = 0;
-		for(int i = 0; i < contents.size(); i++){
-			Layout layout = (Layout)contents.get(i);
-			result += layout.getDesiredWidth();
-		}
-		return result;
+		return desiredWidth;
 	}
 
 	@Override
 	public double getMaxWidth() {
-		double result = 0;
-		for(int i = 0; i < contents.size(); i++){
-			Layout layout = (Layout)contents.get(i);
-			result += layout.getMaxWidth();
-		}
-		return result;
+		return maxWidth;
 	}
 
 	@Override
@@ -58,7 +50,7 @@ public class HStack extends SOReflect implements Layout, Drawable, Interactable 
 		double result = 0;
 		for(int i = 0; i < contents.size(); i++){
 			Layout layout = (Layout)contents.get(i);
-			result += layout.getMaxHeight();
+			result += layout.getMinHeight();
 		}
 		return result;
 	}
@@ -144,12 +136,40 @@ public class HStack extends SOReflect implements Layout, Drawable, Interactable 
 	@Override
 	public void setStyle(SO style) {
 		SA contentsArray = style.getArray("contents");
+		double maxMinColumnWidth = -1;
+		double maxMaxColumnWidth = -1;
+		double maxDesiredColumnWidth = -1;
 		for(int i = 0; i < contentsArray.size(); i++){
 			SO shapeObj = contentsArray.getSO(i);
 			Drawable shape = (Drawable)shapeObj;
 			shape.setStyle(shapeObj);
 			contents.add(shape);
+			
+			SOReflect shapeSOR = (SOReflect)shape;
+			String classVal = shapeSOR.getString("columnSpan");
+			double columnSpan = 1;
+			if(classVal != null && classVal.equals("columnSpan")){
+				columnSpan = Double.valueOf(classVal);
+			}
+			
+			Layout layout = (Layout)shape;
+			double minColumnWidth = computeColumnWidth(layout.getMinWidth(),columnSpan);
+			if(maxMinColumnWidth == -1 || minColumnWidth > maxMinColumnWidth){
+				maxMinColumnWidth = minColumnWidth;
+			}
+			double maxColumnWidth = computeColumnWidth(layout.getMaxWidth(),columnSpan);
+			if(maxMaxColumnWidth == -1 || maxColumnWidth > maxMaxColumnWidth){
+				maxMaxColumnWidth = maxColumnWidth;
+			}
+			double desiredColumnWidth = computeColumnWidth(layout.getDesiredWidth(),columnSpan);
+			if(maxDesiredColumnWidth == -1 || desiredColumnWidth > maxDesiredColumnWidth){
+				maxDesiredColumnWidth = desiredColumnWidth;
+			}
 		}
+		
+		minWidth = computeWidth(maxMinColumnWidth);
+		maxWidth = computeWidth(maxMaxColumnWidth);
+		desiredWidth = computeWidth(maxDesiredColumnWidth);
 	}
 
 	@Override
@@ -157,6 +177,14 @@ public class HStack extends SOReflect implements Layout, Drawable, Interactable 
 		for(int i = 0; i < contents.size(); i++){
             contents.get(i).paint(g);
 		}
+	}
+	
+	private double computeColumnWidth(double width, double columnSpan){
+		return (width-((columnSpan-1)*gutter))/columnSpan;
+	}
+	
+	private double computeWidth(double maxChildWith){
+		return (maxChildWith*nColumns)+(gutter*(nColumns-1));
 	}
 
 }

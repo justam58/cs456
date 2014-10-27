@@ -1,4 +1,4 @@
-package widget;
+package sparkClass;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -7,12 +7,12 @@ import java.util.ArrayList;
 
 import able.Drawable;
 import able.Interactable;
+import able.Layout;
 import able.Selectable;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import view.Layout;
 
 public class Group extends SOReflect implements Drawable, Selectable, Interactable, Layout {
 	

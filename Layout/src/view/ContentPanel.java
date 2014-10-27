@@ -14,7 +14,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPanel;
 
-import widget.Root;
+import sparkClass.Root;
 
 @SuppressWarnings("serial")
 public class ContentPanel extends JPanel {

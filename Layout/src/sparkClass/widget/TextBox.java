@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.widget;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -6,18 +6,21 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 import listener.ActiveListener;
+import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import view.Layout;
+import sparkClass.Root;
+import sparkClass.shape.Text;
 import able.Drawable;
 import able.Interactable;
+import able.Layout;
 import able.Selectable;
 
-public class Button extends SOReflect implements Drawable, Interactable, Layout {
+public class TextBox extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
 	
-	// Button{ label:"my label", contents:[...],state:"idle", idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], value:10 } 
+	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], desiredChars:10 }
 	public String label;
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
 	public ArrayList<String> models = new ArrayList<String>(); 
@@ -25,21 +28,22 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 	public Color idle;
 	public Color hover;
 	public Color active;
-	public double value;
+	public boolean edit;
+	public double cursor = -1;
 	
+	public double desiredChars;
+	
+//	private Text textContent;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
 			ActiveListener listener = listeners.get(i);
-			if(clicked && state.equals("idle")){
+			if(clicked){
 				listener.stateChanged(active);
 			}
-			else if(clicked && state.equals("active")){
-				listener.stateChanged(idle);
-			}
-			else if(!clicked && hovered){ // hover
+			else if(!clicked && !state.equals("active") && hovered){ // hover
 				listener.stateChanged(hover);
 			}
 			else if(!clicked && !hovered){ //idle or active
@@ -56,73 +60,7 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 		}
 		root.repaint();
 	}
-	
-	@Override
-	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){
-			if(contents.get(i) instanceof Selectable){
-				Selectable content = (Selectable)contents.get(i);
-				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
-				if(selectPath != null){
-					updateState(true, false);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){
-			if(contents.get(i) instanceof Selectable){
-				Selectable shape = (Selectable)contents.get(i);
-				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
-				if(selectPath != null){
-					updateState(false, true);
-					return true;
-				}
-			}
-		}
-		updateState(false, false);
-		return false;
-	}
-	
-	@Override
-	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		for(int i = contents.size()-1; i >= 0; i--){
-			if(contents.get(i) instanceof Selectable){
-				Selectable shape = (Selectable)contents.get(i);
-				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
-				if(selectPath != null){
-					updateState(false, true);
-					if(state.equals("active") && models.size() > 0){
-						root.model = root.model.update(models, root.model, 0, String.valueOf(value));
-					}
-					state = "idle";
-					return true;
-				}
-			}
-		}
-		state = "idle";
-		return false;
-	}
-	
-	@Override
-	public boolean key(char key) {
-		return false;
-	}
-	
-	@Override
-	public Root getPanel() {
-		SParented parent = myParent(); 
-		while(!(parent instanceof Interactable)){
-			parent = parent.myParent();
-		}
-		Interactable InteractableParent = (Interactable)parent;
-		return InteractableParent.getPanel();
-	}
-	
+
 	@Override
 	public void setStyle(SO style) {
 //		SA contentsArray = style.getArray("contents");
@@ -164,33 +102,99 @@ public class Button extends SOReflect implements Drawable, Interactable, Layout 
 			}
 		}
 		
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ActiveListener activeShape = (ActiveListener)shape; 
-				listeners.add(activeShape);
-				if(state.equals("active")){
-					activeShape.stateChanged(active);
-				}
-				else{
-					activeShape.stateChanged(idle);
-				}
-			}
-			if(classVal != null && classVal.equals("label")){
-				Text activeShape = (Text)shape;
-				activeShape.changeLabel(label);
-			}
-		}
-		
 		root = getPanel();
+		root.model.addListener(models, root.model, 0, this);
+				
+//		for(int j = 0; j < contents.size(); j++){
+//			SOReflect shape = (SOReflect)contents.get(j);
+//			String classVal = shape.getString("class");
+//			if(classVal != null && classVal.equals("active")){
+//				ActiveListener listener = (ActiveListener)shape;
+//				listeners.add(listener);
+//				if(state.equals("idle")){
+//					listener.stateChanged(idle);
+//				}
+//			}
+//			if(classVal != null && classVal.equals("content")){
+//				textContent = (Text)shape;
+//				textContent.edit = this.edit;
+//				textContent.cursor = this.cursor;
+//				textContent.models = this.models;
+//				textContent.text = root.model.getValue(models, root.model, 0);
+//			}
+//		}
+		
 	}
-	
+
 	@Override
 	public void paint(Graphics g) {
 		for(int i = 0; i < contents.size(); i++){
 			contents.get(i).paint(g);
 		}
+	}
+
+	@Override
+	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
+		for(int i = contents.size()-1; i >= 0; i--){
+			if(contents.get(i) instanceof Selectable){
+				Selectable content = (Selectable)contents.get(i);
+				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
+				if(selectPath != null){
+					updateState(true, false);
+					if(edit){
+//						textContent.editing(x);
+					}
+					return true;
+				}
+			}
+		}
+		state = "idle";
+		updateState(false, false);
+//		textContent.cursor = -1;
+		return false;
+	}
+
+	@Override
+	public boolean mouseMove(double x, double y, AffineTransform myTransform) {
+		for(int i = contents.size()-1; i >= 0; i--){
+			if(contents.get(i) instanceof Selectable){
+				Selectable shape = (Selectable)contents.get(i);
+				ArrayList<Integer> selectPath = shape.select(x, y, 0, myTransform);
+				if(selectPath != null){
+					updateState(false, true);
+					return true;
+				}
+			}
+		}
+		updateState(false, false);
+		return false;
+	}
+
+	@Override
+	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
+		return false;
+	}
+
+	@Override
+	public boolean key(char key) {
+		return false;
+	}
+
+	@Override
+	public Root getPanel() {
+		SParented parent = myParent(); 
+		while(!(parent instanceof Interactable)){
+			parent = parent.myParent();
+		}
+		Interactable InteractableParent = (Interactable)parent;
+		return InteractableParent.getPanel();
+	}
+
+	@Override
+	public void modelChanged(String newValue) {
+//		if(textContent.text != newValue){
+//			textContent.text = newValue;
+//		}
 	}
 
 	@Override

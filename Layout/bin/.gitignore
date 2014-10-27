@@ -1,8 +1,7 @@
-/able/
-/listener/
-/main/
-/model/
-/view/
-/widget/
-/widgets/
-/drawable/
+/layout
+/shape
+/widget
+/able
+/model
+/view
+/sparkClass

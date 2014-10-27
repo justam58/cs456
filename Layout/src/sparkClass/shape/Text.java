@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.shape;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -17,6 +17,7 @@ import able.Selectable;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import sparkClass.Root;
 
 public class Text extends SOReflect implements Drawable, Selectable, Interactable {
 	

@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.widget;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,13 +12,16 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import view.Layout;
+import sparkClass.Root;
+import sparkClass.shape.Line;
+import sparkClass.shape.Rect;
 import able.Dragable;
 import able.Drawable;
 import able.Interactable;
+import able.Layout;
 import able.Selectable;
 
-public class ScrollH extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
+public class ScrollV extends SOReflect implements Interactable, Drawable, ModelListener, Layout {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
@@ -37,12 +40,12 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 	private double d_dragStart;
 	private double sliderMax;
 	private double sliderMin;
-	private double sliderWidth;
+	private double sliderHeight;
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
 	
 	private void updateState(boolean clicked, boolean hovered){
-		for(int i = 0; i < listeners.size(); i++){
+		for(int i = 0; i < listeners.size();i++){
 			ActiveListener listener = listeners.get(i);
 			if(clicked && state.equals("idle")){
 				listener.stateChanged(active);
@@ -71,24 +74,24 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 	private void setSliderMaxAndMin(){
 		if(ranger instanceof Rect){
 			Rect rangeRect = (Rect)ranger;
-			sliderMin = rangeRect.left;
-			sliderMax = rangeRect.left+rangeRect.width-sliderWidth;
+			sliderMin = rangeRect.top;
+			sliderMax = rangeRect.top+rangeRect.height-sliderHeight;
 		}
 		if(ranger instanceof Line){
 			Line rangeLine = (Line)ranger;
-			double xRight = Math.min(rangeLine.x1, rangeLine.x2);
-			double yLeft = Math.max(rangeLine.x1, rangeLine.x2);
-			sliderMin = yLeft;
-			sliderMax = xRight-sliderWidth;
+			double yTop = Math.min(rangeLine.y1, rangeLine.y2);
+			double yBot = Math.max(rangeLine.y1, rangeLine.y2);
+			sliderMin = yTop;
+			sliderMax = yBot-sliderHeight;
 		}
 	}
 	
 	private double valueToModel(double v){
-		return ((v-sliderMin)*(max-min)/(sliderMax-sliderMin))+min;
+		return max-((v-sliderMin)*(max-min)/(sliderMax-sliderMin));
 	}
 	
 	private double valueFromModel(double v){
-		return ((v-min)*(sliderMax-sliderMin)/(max-min))+sliderMin;
+		return sliderMax-((v-min)*(sliderMax-sliderMin)/(max-min));
 	}
 	
 	@Override
@@ -132,45 +135,45 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 			}
 		}
 		
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ActiveListener listener = (ActiveListener)shape;
-				listeners.add(listener);
-				if(state.equals("active")){
-					listener.stateChanged(active);
-				}
-				else if(state.equals("idle")){
-					listener.stateChanged(idle);
-				}
-			}
-			if(classVal != null && classVal.equals("range")){
-				Interactable rangerShape = (Interactable)shape;
-				ranger = rangerShape;
-			}
-			if(classVal != null && classVal.equals("slide")){
-				Dragable dragableSlider = (Dragable)shape;
-				slider = dragableSlider;
-				sliderWidth = slider.getSliderWidth();
-				setSliderMaxAndMin();
-			}
-		}
+//		for(int j = 0; j < contents.size(); j++){
+//			SOReflect shape = (SOReflect)contents.get(j);
+//			String classVal = shape.getString("class");
+//			if(classVal != null && classVal.equals("active")){
+//				ActiveListener listener = (ActiveListener)shape;
+//				listeners.add(listener);
+//				if(state.equals("active")){
+//					listener.stateChanged(active);
+//				}
+//				else if(state.equals("idle")){
+//					listener.stateChanged(idle);
+//				}
+//			}
+//			if(classVal != null && classVal.equals("range")){
+//				Interactable rangerShape = (Interactable)shape;
+//				ranger = rangerShape;
+//			}
+//			if(classVal != null && classVal.equals("slide")){
+//				Dragable dragableSlider = (Dragable)shape;
+//				slider = dragableSlider;
+//				sliderHeight = slider.getSliderHeight();
+//				setSliderMaxAndMin();
+//			}
+//		}
 		
 		root = getPanel();
 		root.model.addListener(models, root.model, 0, this);
 		
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("slide")){
-				Object value = root.model.getValue(models, root.model, 0);
-				if(value != null){
-					double modelValue =  Double.valueOf(root.model.getValue(models, root.model, 0));
-					slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
-				}
-			}
-		}
+//		for(int j = 0; j < contents.size(); j++){
+//			SOReflect shape = (SOReflect)contents.get(j);
+//			String classVal = shape.getString("class");
+//			if(classVal != null && classVal.equals("slide")){
+//				Object value = root.model.getValue(models, root.model, 0);
+//				if(value != null){
+//					double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+//					slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+//				}
+//			}
+//		}
 		
 	}
 
@@ -195,7 +198,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
-						d_dragStart = endp.getX();
+						d_dragStart = endp.getY();
 					}
 					return true;
 				}
@@ -210,9 +213,9 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 			Point2D endp = new Point2D.Double();
 			myTransform.transform(new Point2D.Double(x,y), endp);
 			
-			double d_delta = (endp.getX() - d_dragStart);
-			d_dragStart = endp.getX();
-			double newModelValue = valueToModel(slider.move(d_delta, 0, sliderMax, sliderMin));
+			double d_delta = (endp.getY() - d_dragStart);
+			d_dragStart = endp.getY();
+			double newModelValue = valueToModel(slider.move(0, d_delta, sliderMax, sliderMin));
 			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
 			updateState(true, false);
@@ -250,7 +253,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 							newValue = max;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
+						slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 					}
 					else if(classVal != null && classVal.equals("down") && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
@@ -259,7 +262,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 							newValue = min;
 						}
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
+						slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 					}
 					state = "idle";
 					return true;
@@ -284,13 +287,16 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 		Interactable InteractableParent = (Interactable)parent;
 		return InteractableParent.getPanel();
 	}
-	
+
 	@Override
 	public void modelChanged(String newValue) {
-		double modelValue = Double.valueOf(newValue);
-		if(modelValue != slider.getCurrentX()){
-			slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
+		try{
+			double modelValue = Double.valueOf(newValue);
+			if(modelValue != slider.getCurrentY()){
+				slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+			}
 		}
+		catch(NumberFormatException e){}
 	}
 
 	@Override
@@ -307,7 +313,8 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 
 	@Override
 	public double getMaxWidth() {
-		return Double.MAX_VALUE;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -330,8 +337,7 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 
 	@Override
 	public double getMaxHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.MAX_VALUE;
 	}
 
 	@Override

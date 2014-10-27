@@ -19,7 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
-import widget.Root;
+import sparkClass.Root;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
@@ -73,7 +73,8 @@ public class MainFrame extends JFrame{
                 if (file != null && returnVal == JFileChooser.APPROVE_OPTION) {
                     try {
                         contentPanel.clean();
-                        SONReader reader = new SONReader(new String[]{"widget"}, new FileInputStream(file));
+                        String[] sparkClasses = new String[]{"sparkClass.widget","sparkClass.shape","sparkClass.layout","sparkClass"};
+                        SONReader reader = new SONReader(sparkClasses, new FileInputStream(file));
                         SV sv = reader.read();
                         SO style = sv.getSO();
                         Root root = (Root) style;

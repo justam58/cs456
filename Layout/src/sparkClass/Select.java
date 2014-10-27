@@ -1,4 +1,4 @@
-package widget;
+package sparkClass;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

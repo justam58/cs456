@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.shape;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,6 +14,7 @@ import able.Interactable;
 import able.Selectable;
 import spark.data.SO;
 import spark.data.SOReflect;
+import sparkClass.Root;
 
 public class Line extends SOReflect implements Drawable, Selectable, Interactable {
 	

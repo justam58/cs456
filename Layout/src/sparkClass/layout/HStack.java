@@ -1,4 +1,4 @@
-package widget;
+package sparkClass.layout;
 
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
@@ -6,15 +6,16 @@ import java.util.ArrayList;
 
 import able.Drawable;
 import able.Interactable;
+import able.Layout;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
-import view.Layout;
+import sparkClass.Root;
 
-public class VStack extends SOReflect implements Layout, Drawable, Interactable {
+public class HStack extends SOReflect implements Layout, Drawable, Interactable {
 	
-	// VStack{ contents:[...] }
+	// HStack{ contents:[...] } 
 	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
 
 	@Override
