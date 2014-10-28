@@ -45,9 +45,11 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 		double max = getMaxWidth();
 		double desired = getDesiredWidth();
 		double width = right-left;
+		System.out.println("hstack h " + left + ", " + (right-left));
 		
 		if(min >= width){
 			// give all children their min and let them be clipped
+			System.out.println("hstack give all children their min and let them be clipped");
 			double childLeft = left;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
@@ -58,6 +60,7 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 		}
 		else if(desired >= width){
 			// give min to all and proportional on what is available for desired
+			System.out.println("hstack give min to all and proportional on what is available for desired");
 			double desiredMargin = desired-min;
 			double fraction;
 			if(desiredMargin != 0){
@@ -78,6 +81,7 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 		}
 		else{
 			// allocate what remains based on max width
+			System.out.println("hstack allocate what remains based on max width");
 			double maxMargin = max-desired;
 			double fraction;
 			if(maxMargin != 0){
@@ -139,6 +143,7 @@ public class HStack extends Group implements Layout, Drawable, Interactable {
 
 	@Override
 	public void setVBounds(double top, double bottom) {
+		System.out.println("hstack v " + top + ", " + (bottom-top));
 		for(int i = 0; i < contents.size(); i++){
 			Layout child = (Layout)contents.get(i);
 			child.setVBounds(top, bottom);

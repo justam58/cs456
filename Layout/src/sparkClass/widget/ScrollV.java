@@ -23,7 +23,6 @@ import able.Selectable;
 public class ScrollV extends Group implements Interactable, Drawable, ModelListener, Layout {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
 	public ArrayList<String> models = new ArrayList<String>(); 
 	public String state;
 	public double min;
@@ -46,8 +45,8 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	private Selectable upper;
 	private Selectable downer;
 	private Rect activer;
-	private double barWidth = 10;
-	private double margin = 2;
+	private double barWidth = 20;
+	private double margin = 5;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size();i++){
@@ -100,19 +99,37 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	}
 	
 	@Override
-	public void setStyle(SO style) {
-//		Rect{ class:"active", left:10,top:10, width:20, height:190, fill:{r:255,g:255,b:255}},
-//		Rect{ class:"range", left:10, top:32, width:20, height:130, fill:{r:200,g:200,b:200} },
-//		Polyline{ class:"up", points:[{x:12,y:30},{x:20,y:12},{x:28,y:30}], color:{r:0,g:0,b:0}, thickness: 3 },
-//		Polyline{ class:"down", points:[{x:12,y:170},{x:20,y:198},{x:28,y:170}], color:{r:0,g:0,b:0}, thickness: 3 },
-//		Rect{ class:"slide", left:10, top:100, width:20, height:30,fill:{r:0,g:0,b:0} }
-		
+	public void setStyle(SO style) {	
 		
 		SA modelsObj = style.getArray("model");
 		if(modelsObj != null){
 			for(int i = 0; i < modelsObj.size(); i++){
 				models.add(modelsObj.get(i).toString().replace("\"", ""));
 			}
+		}
+		
+		SO idleObj = style.getObj("idle");
+		if(idleObj != null){
+			int r = (int)idleObj.getDouble("r");
+			int g = (int)idleObj.getDouble("g");
+			int b = (int)idleObj.getDouble("b");
+			idle = new Color(r, g, b);
+		}
+		
+		SO hoverObj = style.getObj("hover");
+		if(hoverObj != null){
+			int r = (int)hoverObj.getDouble("r");
+			int g = (int)hoverObj.getDouble("g");
+			int b = (int)hoverObj.getDouble("b");
+			hover = new Color(r, g, b);
+		}
+		
+		SO activeObj = style.getObj("active");
+		if(hoverObj != null){
+			int r = (int)activeObj.getDouble("r");
+			int g = (int)activeObj.getDouble("g");
+			int b = (int)activeObj.getDouble("b");
+			active = new Color(r, g, b);
 		}
 		
 		root = getPanel();
@@ -122,6 +139,11 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 		Rect rectSlide = new Rect(0,barWidth,barWidth,barWidth);
 		Polyline arrowUp = new Polyline(new int[]{(int) margin,(int) (barWidth/margin),(int) (barWidth-margin)},new int[]{(int) (barWidth-margin),(int) margin,(int) (barWidth-margin)},3);
 		Polyline arrowDown = new Polyline(new int[]{(int) margin,(int) (barWidth/2),(int) (barWidth-margin)},new int[]{92,98,92},3);
+		
+		rectRange.fill = Color.LIGHT_GRAY;
+		arrowUp.color = Color.BLACK;
+		arrowDown.color = Color.BLACK;
+		rectSlide.fill = Color.BLACK;
 		
 		contents.add(rectActive);
 		contents.add(rectRange);
@@ -158,29 +180,8 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 			slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
 		}
 		
-		
-		SO idleObj = style.getObj("idle");
-		if(idleObj != null){
-			int r = (int)idleObj.getDouble("r");
-			int g = (int)idleObj.getDouble("g");
-			int b = (int)idleObj.getDouble("b");
-			idle = new Color(r, g, b);
-		}
-		
-		SO hoverObj = style.getObj("hover");
-		if(hoverObj != null){
-			int r = (int)hoverObj.getDouble("r");
-			int g = (int)hoverObj.getDouble("g");
-			int b = (int)hoverObj.getDouble("b");
-			hover = new Color(r, g, b);
-		}
-		
-		SO activeObj = style.getObj("active");
-		if(hoverObj != null){
-			int r = (int)activeObj.getDouble("r");
-			int g = (int)activeObj.getDouble("g");
-			int b = (int)activeObj.getDouble("b");
-			active = new Color(r, g, b);
+		if(state.equals("idle")){
+			listener.stateChanged(idle);
 		}
 		
 	}
@@ -298,28 +299,49 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public void setHBounds(double left, double right) {
+		System.out.println("scrollv h " + left + ", " + (right-left));
+		
 		activer.left = left;
 		activer.width = barWidth;
+		
+		Polyline arrowUp = (Polyline)upper;
+		arrowUp.setXPoints(new int[]{(int) (left+margin),(int) (left+barWidth/2),(int) (left+barWidth-margin)});
+		Polyline arrowDown = (Polyline)downer;
+		arrowDown.setXPoints(new int[]{(int) (left+margin),(int) (left+barWidth/2),(int) (left+barWidth-margin)});
+		
+		Rect rangerRect = (Rect)ranger;
+		rangerRect.left = left;
+		
+		Rect sliderRect = (Rect)slider;
+		sliderRect.left = left;
+		
 	}
 
 	@Override
 	public double getMinHeight() {
-		return 50;
+		return barWidth*4;
 	}
 
 	@Override
 	public double getDesiredHeight() {
-		return 100;
+		return 200;
 	}
 
 	@Override
 	public double getMaxHeight() {
-		return Double.MAX_VALUE;
+		return 1000000;
 	}
 
 	@Override
 	public void setVBounds(double top, double bottom) {
 		double height = bottom-top;
+		System.out.println("scrollv v " + top + ", " + height);
+		
+		if(height < getMinHeight()){
+			height = getMinHeight();
+			bottom = top + height;
+		}
+		
 		activer.top = top;
 		activer.height = height;
 		

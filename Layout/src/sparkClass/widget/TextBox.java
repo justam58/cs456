@@ -24,7 +24,6 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 	
 	// TextBox{ state:"idle", contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], desiredChars:10 }
 	public String label;
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
 	public ArrayList<String> models = new ArrayList<String>(); 
 	public String state;
 	public Color idle;
@@ -201,7 +200,12 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public double getMaxWidth() {
-		return Double.MAX_VALUE;
+		String wString = "";
+		for(int i = 0; i < desiredChars; i++){
+			wString += "W";
+		}
+		int stringWidth = fontMetrics.stringWidth(wString);
+		return stringWidth+marginWidth*2;
 	}
 
 	@Override
@@ -209,6 +213,10 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		double width = right-left;
 		textBox.left = left;
 		textBox.width = width;
+		if(width > getDesiredWidth()){
+			textBox.width = getDesiredWidth();
+			width = getDesiredWidth();
+		}
 		System.out.println("textbox h " + left + ", " + width);
 		int contentWidth = fontMetrics.stringWidth(textContent.text);
 		if(contentWidth > width){
@@ -243,18 +251,22 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 	@Override
 	public void setVBounds(double top, double bottom) {
 		double height = bottom-top;
+		System.out.println("textbox v " + top + ", " + height);
 		textBox.top = top;
 		textBox.height = height;
-		System.out.println("textbox v " + top + ", " + height);
+		if(height > getDesiredHeight()){
+			textBox.height = getDesiredHeight();
+			height = getDesiredHeight();
+		}
 		int contentHeight = fontMetrics.getHeight();
-		System.out.println("contentHeight " + contentHeight);
+//		System.out.println("contentHeight " + contentHeight);
 		if(contentHeight > height){
 			// TODO what?
 		}
 		else{
 			double spaceLeft = height - contentHeight;
-			System.out.println("spaceLeft " + spaceLeft);
-			textContent.y = bottom - spaceLeft/2;
+//			System.out.println("spaceLeft " + spaceLeft);
+			textContent.y = top + contentHeight + spaceLeft/2;
 		}
 	}
 	

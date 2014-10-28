@@ -102,7 +102,7 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
 				double childHeight = child.getMinHeight();
-				child.setVBounds(childTop, childTop+childTop);
+				child.setVBounds(childTop, childTop+childHeight);
 				childTop += childHeight;
 			}
 		}

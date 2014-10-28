@@ -1,7 +1,6 @@
 package sparkClass.widget;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -10,10 +9,10 @@ import listener.ActiveListener;
 import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
-import spark.data.SOReflect;
 import sparkClass.Group;
 import sparkClass.Root;
 import sparkClass.shape.Line;
+import sparkClass.shape.Polyline;
 import sparkClass.shape.Rect;
 import able.Dragable;
 import able.Drawable;
@@ -24,7 +23,6 @@ import able.Selectable;
 public class ScrollH extends Group implements Interactable, Drawable, ModelListener, Layout {
 	
 	//ScrollV{ state:"idle",contents:[...], idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], max:1.0, min:0.0, step:0.1}
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>();
 	public ArrayList<String> models = new ArrayList<String>(); 
 	public String state;
 	public double min;
@@ -44,10 +42,11 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
 	
-	private double top;
-	private double bottom;
-	private double left;
-	private double right;
+	private Selectable upper;
+	private Selectable downer;
+	private Rect activer;
+	private double barWidth = 20;
+	private double margin = 5;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -101,13 +100,13 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	
 	@Override
 	public void setStyle(SO style) {
-//		SA contentsArray = style.getArray("contents");
-//		for(int i = 0; i < contentsArray.size(); i++){
-//			SO shapeObj = contentsArray.getSO(i);
-//			Drawable shape = (Drawable)shapeObj;
-//			shape.setStyle(shapeObj);
-//			contents.add(shape);
-//		}
+		
+		SA modelsObj = style.getArray("model");
+		if(modelsObj != null){
+			for(int i = 0; i < modelsObj.size(); i++){
+				models.add(modelsObj.get(i).toString().replace("\"", ""));
+			}
+		}
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -133,52 +132,57 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 			active = new Color(r, g, b);
 		}
 		
-		SA modelsObj = style.getArray("model");
-		if(modelsObj != null){
-			for(int i = 0; i < modelsObj.size(); i++){
-				models.add(modelsObj.get(i).toString().replace("\"", ""));
-			}
-		}
-		
-		for(int j = 0; j < contents.size(); j++){
-			SOReflect shape = (SOReflect)contents.get(j);
-			String classVal = shape.getString("class");
-			if(classVal != null && classVal.equals("active")){
-				ActiveListener listener = (ActiveListener)shape;
-				listeners.add(listener);
-				if(state.equals("active")){
-					listener.stateChanged(active);
-				}
-				else if(state.equals("idle")){
-					listener.stateChanged(idle);
-				}
-			}
-			if(classVal != null && classVal.equals("range")){
-				Interactable rangerShape = (Interactable)shape;
-				ranger = rangerShape;
-			}
-			if(classVal != null && classVal.equals("slide")){
-				Dragable dragableSlider = (Dragable)shape;
-				slider = dragableSlider;
-				sliderWidth = slider.getSliderWidth();
-				setSliderMaxAndMin();
-			}
-		}
-		
 		root = getPanel();
-		root.model.addListener(models, root.model, 0, this);
 		
-//		for(int j = 0; j < contents.size(); j++){
-//			SOReflect shape = (SOReflect)contents.get(j);
-//			String classVal = shape.getString("class");
-//			if(classVal != null && classVal.equals("slide")){
-//				Object value = root.model.getValue(models, root.model, 0);
-//				if(value != null){
-//					double modelValue =  Double.valueOf(root.model.getValue(models, root.model, 0));
-//					slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
-//				}
-//			}
-//		}
+		Rect rectActive = new Rect(0,0,100,barWidth);
+		Rect rectRange = new Rect(barWidth,0,80,barWidth);
+		Rect rectSlide = new Rect(barWidth,0,barWidth,barWidth);
+		Polyline arrowUp = new Polyline(new int[]{92,98,92},new int[]{(int) margin,(int) (barWidth/2),(int) (barWidth-margin)},3);
+		Polyline arrowDown = new Polyline(new int[]{(int) (barWidth-margin),(int) margin,(int) (barWidth-margin)},new int[]{(int) margin,(int) (barWidth/margin),(int) (barWidth-margin)},3);
+		
+		rectRange.fill = Color.LIGHT_GRAY;
+		arrowUp.color = Color.BLACK;
+		arrowDown.color = Color.BLACK;
+		rectSlide.fill = Color.BLACK;
+		
+		contents.add(rectActive);
+		contents.add(rectRange);
+		contents.add(rectSlide);
+		contents.add(arrowUp);
+		contents.add(arrowDown);
+		
+		root.model.addListener(models, root.model, 0, this);
+		ActiveListener listener = (ActiveListener)rectActive;
+		listeners.add(listener);
+		
+		if(state.equals("active")){
+			listener.stateChanged(active);
+		}
+		else if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
+		
+		Interactable rangerShape = (Interactable)rectRange;
+		ranger = rangerShape;
+		
+		Dragable dragableSlider = (Dragable)rectSlide;
+		slider = dragableSlider;
+		sliderWidth = slider.getSliderWidth();
+		setSliderMaxAndMin();
+		
+		upper = (Selectable)arrowUp;
+		downer = (Selectable)arrowDown;
+		activer = rectActive;
+		
+		Object value = root.model.getValue(models, root.model, 0);
+		if(value != null){
+			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
+		}
+		
+		if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
 		
 	}
 
@@ -190,9 +194,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 				ArrayList<Integer> selectPath = content.select(x, y, i, myTransform);
 				if(selectPath != null){
 					updateState(true, false);
-					SOReflect shape = (SOReflect)content;
-					String classVal = shape.getString("class");
-					if(classVal != null && classVal.equals("slide")){
+					if(content.equals((Selectable)slider)){
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
@@ -242,9 +244,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
 				if(selectPath != null){
 					updateState(false, true);
-					SOReflect shape = (SOReflect)content;
-					String classVal = shape.getString("class");
-					if(classVal != null && classVal.equals("up") && models.size() > 0){
+					if(content.equals((Selectable)upper) && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)+step;
 						if(newValue > max){
@@ -253,7 +253,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 						root.model = root.model.update(models, root.model, 0, newValue.toString());
 						slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
 					}
-					else if(classVal != null && classVal.equals("down") && models.size() > 0){
+					else if(content.equals((Selectable)downer) && models.size() > 0){
 						String value = (String)root.model.getValue(models, root.model, 0);
 						Double newValue = Double.valueOf(value)-step;
 						if(newValue < min){
@@ -284,54 +284,82 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public double getMinWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth*4;
 	}
 
 	@Override
 	public double getDesiredWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 200;
 	}
 
 	@Override
 	public double getMaxWidth() {
-		return Double.MAX_VALUE;
+		return 1000000;
 	}
 
 	@Override
 	public void setHBounds(double left, double right) {
-		this.left = left;
-		this.right = right;
+		double width = right-left;
+		System.out.println("scrollh h " + left + ", " + width);
+		
+		if(width < getMinWidth()){
+			width = getMinWidth();
+			right = left + width;
+		}
+		
+		activer.left = left;
+		activer.width = width;
+		
+		Rect rangerRect = (Rect)ranger;
+		rangerRect.left = left+barWidth;
+		rangerRect.width = width - barWidth*2;
+		
+		Polyline arrowUp = (Polyline)upper;
+		arrowUp.setXPoints(new int[]{(int) (right-barWidth+margin), (int) (right-margin), (int) (right-barWidth+margin)});
+		Polyline arrowDown = (Polyline)downer;
+		arrowDown.setXPoints(new int[]{(int) (left+barWidth-margin),(int) (left+margin),(int) (left+barWidth-margin)});
+		
+		setSliderMaxAndMin();
+		
+		Object value = root.model.getValue(models, root.model, 0);
+		if(value != null){
+			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
+		}
 	}
 
 	@Override
 	public double getMinHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public double getDesiredHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public double getMaxHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return barWidth;
 	}
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		this.top = top;
-		this.bottom = bottom;
-	}
-	
-	@Override
-	public void paint(Graphics g){
+		System.out.println("scrollh v " + top + ", " + (bottom-top));
 		
+		activer.top = top;
+		activer.height = barWidth;
+		
+		Polyline arrowUp = (Polyline)upper;
+		arrowUp.setYPoints(new int[]{(int) (top+margin),(int) (top+barWidth/2),(int) (top+barWidth-margin)});
+		Polyline arrowDown = (Polyline)downer;
+		arrowDown.setYPoints(new int[]{(int) (top+margin),(int) (top+barWidth/2),(int) (top+barWidth-margin)});
+		
+		Rect rangerRect = (Rect)ranger;
+		rangerRect.top = top;
+		
+		Rect sliderRect = (Rect)slider;
+		sliderRect.top = top;
 	}
 
 }
