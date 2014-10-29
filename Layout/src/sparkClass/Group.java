@@ -168,8 +168,16 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 
 	@Override
 	public void setHBounds(double left, double right) {
-		// TODO Auto-generated method stub
-		
+//		int childNumber = contents.size();
+//		double uniformScale = (right-left)/childNumber;
+//		double childTop = left;
+//		for(int i = 0; i < contents.size(); i++){
+//			Layout child = (Layout)contents.get(i);
+//			double child = child.getMinHeight();
+//			child.setHBounds(childTop, childTop+childHeight);
+//			left += childHeight;
+//		}
+		// TODO
 	}
 
 	@Override

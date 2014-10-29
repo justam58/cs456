@@ -109,14 +109,8 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 		else if(desired >= height){
 			// give min to all and proportional on what is available for desired
 			System.out.println("vstack give min to all and proportional on what is available for desired");
-			double desiredMargin = desired-min;
-			double fraction;
-			if(desiredMargin != 0){
-				fraction = (height-min)/desiredMargin;
-			}
-			else{
-				fraction = height-min;
-			}
+			double desiredMargin = (desired-min) == 0 ? 1 : (desired-min);
+			double fraction = (height-min)/desiredMargin;
 			double childTop = top;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
@@ -130,25 +124,14 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 		else{
 			// allocate what remains based on max height
 			System.out.println("vstack allocate what remains based on max height");
-			double maxMargin = max-desired;
-			double fraction;
-			if(maxMargin != 0){
-				fraction = (height-desired)/maxMargin;
-			}
-			else{
-				fraction = height-desired;
-			}
+			double maxMargin = (max-desired) == 0 ? 1 : (max-desired);
+			double fraction = (height-desired)/maxMargin;
 			double childTop = top;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
 				double childDesiredHeight = child.getDesiredHeight();
 				double childMaxHeight = child.getMaxHeight();
 				double childHeight = childDesiredHeight+(childMaxHeight-childDesiredHeight)*fraction;
-//				System.out.println("maxMargin " + maxMargin);
-//				System.out.println("max " + max);
-//				System.out.println("desired " + desired);
-//				System.out.println("fraction " + fraction);
-//				System.out.println("childHeight " + childHeight);
 				child.setVBounds(childTop, childTop+childHeight);
 				childTop += childHeight;
 			}

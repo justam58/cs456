@@ -1,7 +1,9 @@
 package sparkClass.widget;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
@@ -10,6 +12,8 @@ import spark.data.SA;
 import spark.data.SO;
 import sparkClass.Group;
 import sparkClass.Root;
+import sparkClass.shape.Rect;
+import sparkClass.shape.Text;
 import able.Drawable;
 import able.Interactable;
 import able.Layout;
@@ -19,7 +23,6 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 	
 	// Button{ label:"my label", contents:[...],state:"idle", idle:{r:0,g:0,b:0}, hover:{r:100,g:100,b:100}, active:{r:255,g:255,b:0}, model:[...], value:10 } 
 	public String label;
-	public ArrayList<Drawable> contents = new ArrayList<Drawable>(); // SArray of Drawable objects
 	public ArrayList<String> models = new ArrayList<String>(); 
 	public String state;
 	public Color idle;
@@ -30,10 +33,12 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
 	
-	private double top;
-	private double bottom;
-	private double left;
-	private double right;
+	private Rect buttonBackground;
+	private Text buttonLabel;
+	
+	private FontMetrics fontMetrics;
+	private double marginWidth = 10;
+	private double marginHeight = 10;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -115,13 +120,13 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 	
 	@Override
 	public void setStyle(SO style) {
-//		SA contentsArray = style.getArray("contents");
-//		for(int i = 0; i < contentsArray.size(); i++){
-//			SO shapeObj = contentsArray.getSO(i);
-//			Drawable shape = (Drawable)shapeObj;
-//			shape.setStyle(shapeObj);
-//			contents.add(shape);
-//		}
+		
+		SA modelsObj = style.getArray("model");
+		if(modelsObj != null){
+			for(int i = 0; i < modelsObj.size(); i++){
+				models.add(modelsObj.get(i).toString().replace("\"", ""));
+			}
+		}
 		
 		SO idleObj = style.getObj("idle");
 		if(idleObj != null){
@@ -147,86 +152,111 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 			active = new Color(r, g, b);
 		}
 		
-		SA modelsObj = style.getArray("model");
-		if(modelsObj != null){
-			for(int i = 0; i < modelsObj.size(); i++){
-				models.add(modelsObj.get(i).toString().replace("\"", ""));
-			}
-		}
-		
-//		for(int j = 0; j < contents.size(); j++){
-//			SOReflect shape = (SOReflect)contents.get(j);
-//			String classVal = shape.getString("class");
-//			if(classVal != null && classVal.equals("active")){
-//				ActiveListener activeShape = (ActiveListener)shape; 
-//				listeners.add(activeShape);
-//				if(state.equals("active")){
-//					activeShape.stateChanged(active);
-//				}
-//				else{
-//					activeShape.stateChanged(idle);
-//				}
-//			}
-//			if(classVal != null && classVal.equals("label")){
-//				Text activeShape = (Text)shape;
-//				activeShape.changeLabel(label);
-//			}
-//		}
-		
 		root = getPanel();
+		
+		Rect rect = new Rect(0,0,50,50);
+		Text text = new Text(label,0,0,"serif",15,false,-1,models);
+		
+		contents.add(rect);
+		contents.add(text);
+		
+		buttonBackground = rect;
+		buttonLabel = text;
+		
+		ActiveListener listener = (ActiveListener)rect;
+		listeners.add(listener);
+		
+		if(state.equals("idle")){
+			listener.stateChanged(idle);
+		}
+
 	}
 	
 	@Override
 	public double getMinWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.stringWidth(label) + marginWidth*2;
 	}
 
 	@Override
 	public double getDesiredWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.stringWidth(label) + marginWidth*2;
 	}
 
 	@Override
 	public double getMaxWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.stringWidth(label) + marginWidth*2;
 	}
 
 	@Override
 	public void setHBounds(double left, double right) {
-		this.left = left;
-		this.right = right;
+		double width = right-left;
+		buttonBackground.left = left;
+		buttonBackground.width = width;
+		if(width > getDesiredWidth()){
+			buttonBackground.width = getDesiredWidth();
+			width = getDesiredWidth();
+		}
+		System.out.println("textbox h " + left + ", " + width);
+		int contentWidth = fontMetrics.stringWidth(label);
+		if(contentWidth > width){
+			// TODO what?
+		}
+		else{
+			double spaceLeft = width - contentWidth;
+			if(spaceLeft > (marginWidth*2)){
+				buttonLabel.x = left + marginWidth;
+			}
+			else{
+				buttonLabel.x = left + spaceLeft/2;
+			}
+		}
 	}
 
 	@Override
 	public double getMinHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.getHeight();
 	}
 
 	@Override
 	public double getDesiredHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.getHeight()+marginHeight*2;
 	}
 
 	@Override
 	public double getMaxHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fontMetrics.getHeight()+marginHeight*2;
 	}
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		this.top = top;
-		this.bottom = bottom;
+		double height = bottom-top;
+		System.out.println("button v " + top + ", " + height);
+		buttonBackground.top = top;
+		buttonBackground.height = height;
+		if(height > getDesiredHeight()){
+			buttonBackground.height = getDesiredHeight();
+			height = getDesiredHeight();
+		}
+		int contentHeight = fontMetrics.getHeight();
+//		System.out.println("contentHeight " + contentHeight);
+		if(contentHeight > height){
+			// TODO what?
+		}
+		else{
+			double spaceLeft = height - contentHeight;
+//			System.out.println("spaceLeft " + spaceLeft);
+			buttonLabel.y = top + contentHeight + spaceLeft/2;
+		}
 	}
 	
 	@Override
-	public void paint(Graphics g){
-		
+	public void paint(Graphics g) {
+		for(int i = 0; i < contents.size(); i++){
+            contents.get(i).paint(g);
+		}
+		Graphics2D g2d = (Graphics2D)g;
+		fontMetrics = buttonLabel.setFontMetrics(g2d);
+		buttonLabel.setBoundingBox(g2d);
 	}
 
 }
