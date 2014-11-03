@@ -50,7 +50,7 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 
 	@Override
 	public void setHBounds(double left, double right) {
-		System.out.println("vstack h " + left + ", " + (right-left));
+//		System.out.println("vstack h " + left + ", " + (right-left));
 		for(int i = 0; i < contents.size(); i++){
 			Layout child = (Layout)contents.get(i);
 			child.setHBounds(left, right);
@@ -94,10 +94,10 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 		double desired = getDesiredHeight();
 		double height = bottom-top;
 		
-		System.out.println("vstack v " + top + ", " + height);
+//		System.out.println("vstack v " + top + ", " + height);
 		if(min >= height){
 			// give all children their min and let them be clipped
-			System.out.println("vstack give all children their min and let them be clipped");
+//			System.out.println("vstack give all children their min and let them be clipped");
 			double childTop = top;
 			for(int i = 0; i < contents.size(); i++){
 				Layout child = (Layout)contents.get(i);
@@ -108,7 +108,7 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 		}
 		else if(desired >= height){
 			// give min to all and proportional on what is available for desired
-			System.out.println("vstack give min to all and proportional on what is available for desired");
+//			System.out.println("vstack give min to all and proportional on what is available for desired");
 			double desiredMargin = (desired-min) == 0 ? 1 : (desired-min);
 			double fraction = (height-min)/desiredMargin;
 			double childTop = top;
@@ -123,7 +123,7 @@ public class VStack extends Group implements Layout, Drawable, Interactable {
 		}
 		else{
 			// allocate what remains based on max height
-			System.out.println("vstack allocate what remains based on max height");
+//			System.out.println("vstack allocate what remains based on max height");
 			double maxMargin = (max-desired) == 0 ? 1 : (max-desired);
 			double fraction = (height-desired)/maxMargin;
 			double childTop = top;

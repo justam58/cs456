@@ -46,7 +46,7 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	}
 	
 	public void resize(double width, double height){
-		System.out.println("resize " + width + ", " + height);
+//		System.out.println("resize " + width + ", " + height);
 		Layout layout = (Layout)content;
 		layout.setHBounds(0, width);
 		layout.setVBounds(0, height);
@@ -162,7 +162,7 @@ public class Root extends SOReflect implements Drawable, Interactable {
 			Interactable shape = (Interactable)content;
 			shape.mouseUp(x,y,getTransform());
 		}
-//		model.print();
+		model.print();
 		return true;
 	}
 

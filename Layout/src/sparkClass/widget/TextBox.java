@@ -217,7 +217,7 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 			textBox.width = getDesiredWidth();
 			width = getDesiredWidth();
 		}
-		System.out.println("textbox h " + left + ", " + width);
+//		System.out.println("textbox h " + left + ", " + width);
 		int contentWidth = fontMetrics.stringWidth(textContent.text);
 		if(contentWidth > width){
 			// TODO what?
@@ -251,7 +251,7 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 	@Override
 	public void setVBounds(double top, double bottom) {
 		double height = bottom-top;
-		System.out.println("textbox v " + top + ", " + height);
+//		System.out.println("textbox v " + top + ", " + height);
 		textBox.top = top;
 		textBox.height = height;
 		if(height > getDesiredHeight()){
