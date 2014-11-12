@@ -29,7 +29,7 @@ public class MainFrame extends JFrame{
 	
     public MainFrame() {
     	// setup
-        super("Layout");
+        super("Curve");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(800, 600));
     	setSize(new Dimension(800, 600));

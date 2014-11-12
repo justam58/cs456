@@ -10,11 +10,25 @@ import java.util.ArrayList;
 
 import able.Drawable;
 import able.Selectable;
+import spark.data.SA;
+import spark.data.SO;
 import view.ContentPanel;
 
 public class Select extends Group implements Drawable, Selectable {
 	
 	public ArrayList<ArrayList<Integer>> selected = new ArrayList<ArrayList<Integer>>();
+	
+	@Override
+	public void setStyle(SO style){
+		SA contentsArray = style.getArray("contents");
+		for(int i = 0; i < contentsArray.size(); i++){
+			SO shapeObj = contentsArray.getSO(i);
+			Drawable shape = (Drawable)shapeObj;
+			shape.setStyle(shapeObj);
+			contents.add(shape);
+			selected.add(null);
+		}
+	}
 
 	@Override
 	public void paint(Graphics g) {
@@ -84,6 +98,16 @@ public class Select extends Group implements Drawable, Selectable {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
+		AffineTransform atf = new AffineTransform(myTransform);
+		atf.scale(1/sx, 1/sy);
+		atf.rotate(Math.toRadians(rotate));
+		atf.translate(-tx, -ty);
+		select(x,y,0,atf);
+		return true;
 	}
 
 	@Override
