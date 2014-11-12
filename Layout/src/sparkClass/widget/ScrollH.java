@@ -35,7 +35,6 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	private boolean dragging = false;
 	private Dragable slider;
 	private Interactable ranger;
-	private double d_dragStart;
 	private double sliderMax;
 	private double sliderMin;
 	private double sliderWidth;
@@ -198,7 +197,6 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
-						d_dragStart = endp.getX();
 					}
 					return true;
 				}
@@ -212,10 +210,8 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 		if(dragging){
 			Point2D endp = new Point2D.Double();
 			myTransform.transform(new Point2D.Double(x,y), endp);
-			
-			double d_delta = (endp.getX() - d_dragStart);
-			d_dragStart = endp.getX();
-			double newModelValue = valueToModel(slider.move(d_delta, 0, sliderMax, sliderMin));
+
+			double newModelValue = valueToModel(slider.moveTo(endp.getX(), -1, sliderMax, sliderMin));
 			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
 			updateState(true, false);
@@ -300,7 +296,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	@Override
 	public void setHBounds(double left, double right) {
 		double width = right-left;
-		System.out.println("scrollh h " + left + ", " + width);
+//		System.out.println("scrollh h " + left + ", " + width);
 		
 		if(width < getMinWidth()){
 			width = getMinWidth();
@@ -345,7 +341,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public void setVBounds(double top, double bottom) {
-		System.out.println("scrollh v " + top + ", " + (bottom-top));
+//		System.out.println("scrollh v " + top + ", " + (bottom-top));
 		
 		activer.top = top;
 		activer.height = barWidth;

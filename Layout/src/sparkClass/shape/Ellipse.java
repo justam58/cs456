@@ -167,17 +167,20 @@ public class Ellipse extends SOReflect implements Drawable, Selectable, Interact
 	}
 	
 	@Override
-	public void moveTo(double x, double y, double max, double min) {
+	public double moveTo(double x, double y, double max, double min) {
 		if(x != -1){
 			left = x;
 			left = left > max ? max : left;
 			left = left < min ? min : left;
+			return left;
 		}
 		if(y != -1){
 			top = y;
 			top = top > max ? max : top;
 			top = top < min ? min : top;
+			return top;
 		}
+		return -1;
 	}
 
 	@Override

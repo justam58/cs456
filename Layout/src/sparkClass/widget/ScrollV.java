@@ -35,7 +35,6 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	private boolean dragging = false;
 	private Dragable slider;
 	private Interactable ranger;
-	private double d_dragStart;
 	private double sliderMax;
 	private double sliderMin;
 	private double sliderHeight;
@@ -198,7 +197,6 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
-						d_dragStart = endp.getY();
 					}
 					return true;
 				}
@@ -212,10 +210,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 		if(dragging){
 			Point2D endp = new Point2D.Double();
 			myTransform.transform(new Point2D.Double(x,y), endp);
-			
-			double d_delta = (endp.getY() - d_dragStart);
-			d_dragStart = endp.getY();
-			double newModelValue = valueToModel(slider.move(0, d_delta, sliderMax, sliderMin));
+			double newModelValue = valueToModel(slider.moveTo(-1, endp.getY(), sliderMax, sliderMin));
 			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
 			updateState(true, false);
@@ -299,7 +294,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public void setHBounds(double left, double right) {
-		System.out.println("scrollv h " + left + ", " + (right-left));
+//		System.out.println("scrollv h " + left + ", " + (right-left));
 		
 		activer.left = left;
 		activer.width = barWidth;
@@ -335,7 +330,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	@Override
 	public void setVBounds(double top, double bottom) {
 		double height = bottom-top;
-		System.out.println("scrollv v " + top + ", " + height);
+//		System.out.println("scrollv v " + top + ", " + height);
 		
 		if(height < getMinHeight()){
 			height = getMinHeight();

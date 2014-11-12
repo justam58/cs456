@@ -46,7 +46,7 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 
 	@Override
 	public void setHBounds(double left, double right) {
-		System.out.println("columns h " + left + ", " + (right-left));
+//		System.out.println("columns h " + left + ", " + (right-left));
 		childRows = new ArrayList<ArrayList<Layout>>();
 		currentRow = new ArrayList<Layout>();
 		// When Columns receives its width range it will compute a column width of (width-(nColumns-1)*gutter)/nColumns). 
@@ -54,12 +54,16 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 		double width = right-left;
 		double columnWidth = (width-(nColumns-1)*gutter)/nColumns;
 		double columnsLeft = nColumns;
+//		System.out.println("columnWidth " + columnWidth);
 		for(int i = 0; i < contents.size(); i++){
 			Layout child = (Layout)contents.get(i);
 			double childMinWidth = child.getMinWidth();
 			double columnsNeeded = Math.ceil(childMinWidth/columnWidth);
 			// If the total width is not enough then that child is given a row of its own and all the columns in that row. 
+//			System.out.println("columnsNeeded " + columnsNeeded);
+//			System.out.println("columnsLeft " + columnsLeft);
 			if(nColumns < columnsNeeded){
+//				System.out.println("child gets while row (not enough width)");
 				nextRow();
 				currentRow.add(child);
 				nextRow();
@@ -70,20 +74,24 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 			// If the column width is less than the minimum for some child, then it is given more columns until it has enough.
 			// If it has more children than fit in nColumns it will wrap them onto new rows. 
 			if(columnsLeft < columnsNeeded){
+//				System.out.println("child gets to fit in the new row");
 				nextRow();
 				currentRow.add(child);
 				child.setHBounds(left,columnWidth*columnsNeeded);
 				columnsLeft = nColumns - columnsNeeded;
 			}
 			else{
+//				System.out.println("child gets to fit in the current row");
 				currentRow.add(child);
-				double currentLeft = right-columnWidth*columnsLeft;
-				child.setHBounds(currentLeft,currentLeft+columnWidth*columnsNeeded);
+				double currentLeft = right-columnWidth*columnsLeft-(columnsLeft-1)*gutter;
+				child.setHBounds(currentLeft,currentLeft+columnWidth*columnsNeeded+(columnsNeeded-1)*gutter);
 				columnsLeft -= columnsNeeded;
 			}
 		}
 		// It will now know how many rows it needs and which children are in each row.
-		
+		if(currentRow.size() != 0){
+			nextRow();
+		}
 		setRowHegihts();
 	}
 	
@@ -126,15 +134,15 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 	public void setVBounds(double top, double bottom) {
 		// When it gets its height bounds, it will use the min,desired, and max values for the children in each row to determine how much of the vertical space to give to each row. 
 		// This is then set as the height for each object in a row.
-		System.out.println("columns v " + top + ", " + height);
 		double max = getMaxHeight();
 		double min = getMinHeight();
 		double desired = getDesiredHeight();
 		double height = bottom-top;
+//		System.out.println("columns v " + top + ", " + height);
 		
 		if(min >= height){
 			// give all children their min and let them be clipped
-			System.out.println("columns give all children their min and let them be clipped");
+//			System.out.println("columns give all children their min and let them be clipped");
 			double currentTop = top;
 			for(int i = 0; i < childRows.size(); i++){
 				ArrayList<Layout> children = childRows.get(i);
@@ -148,7 +156,7 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 		}
 		else if(desired >= height){
 			// give min to all and proportional on what is available for desired
-			System.out.println("columns give min to all and proportional on what is available for desired");
+//			System.out.println("columns give min to all and proportional on what is available for desired");
 			double desiredMargin = (desired-min) == 0 ? 1 : (desired-min);
 			double fraction = (height-min)/desiredMargin;
 			double currentTop = top;
@@ -166,7 +174,7 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 		}
 		else{
 			// allocate what remains based on max height
-			System.out.println("columns allocate what remains based on max height");
+//			System.out.println("columns allocate what remains based on max height");
 			double maxMargin = (max-desired) == 0 ? 1 : (max-desired);
 			double fraction = (height-desired)/maxMargin;
 			double currentTop = top;

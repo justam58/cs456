@@ -196,7 +196,7 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 			buttonBackground.width = getDesiredWidth();
 			width = getDesiredWidth();
 		}
-		System.out.println("textbox h " + left + ", " + width);
+//		System.out.println("button h " + left + ", " + width);
 		int contentWidth = fontMetrics.stringWidth(label);
 		if(contentWidth > width){
 			// TODO what?
@@ -230,7 +230,7 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 	@Override
 	public void setVBounds(double top, double bottom) {
 		double height = bottom-top;
-		System.out.println("button v " + top + ", " + height);
+//		System.out.println("button v " + top + ", " + height);
 		buttonBackground.top = top;
 		buttonBackground.height = height;
 		if(height > getDesiredHeight()){
