@@ -92,7 +92,7 @@ public class Polygon extends SOReflect implements Drawable, Selectable, Interact
 		int HIT_BOX_SIZE_Y = (int) (HIT_BOX_SIZE / transform.getScaleY());
 		
 		ArrayList<Integer> result = null;
-		// If the ellipse is filled, then it is selected if the selection point is inside the polygon
+		// If the polygon is filled, then it is selected if the selection point is inside the polygon
 		if(fill != null){
 			java.awt.Polygon polygon = new java.awt.Polygon(xPoints,yPoints,xPoints.length);
 			if(polygon.contains(x,y)){
