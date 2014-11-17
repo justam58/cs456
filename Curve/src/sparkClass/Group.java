@@ -35,6 +35,9 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 	private double sliderRotation;
 	public boolean isSlider = false;
 	
+	public double newTy;
+	public double newTx;
+	
 	public void moveTo(double x, double y, double r) {
 		currentX = x;
 		currentY = y;
@@ -99,6 +102,7 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 					atf.translate(centerX, centerY);
 					atf.rotate(Math.toRadians(sliderRotation));
 					atf.translate(-currentX, -currentY);
+					atf.translate(-newTx, -newTy);
 				}
 				Selectable shape = (Selectable)content;
 				ArrayList<Integer> selectPath = shape.select(x,y,i,atf);

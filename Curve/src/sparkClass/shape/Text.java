@@ -218,7 +218,7 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 
 	@Override
 	public Point2D getCenter() {
-		return new Point2D.Double(boundingBox.getCenterX(),boundingBox.getCenterY());
+		return new Point2D.Double(x,y);
 	}
 
 }

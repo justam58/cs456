@@ -26,12 +26,27 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 	
 	private Root root = null;
 	
+	private Point2D.Double[] orgPoints;
 	private Point2D.Double[] points; // control points
 	private Path2D path;
 	private Point2D.Double P, Q, R, S; // arch points
 	private ArrayList<SegCurve> curves = new ArrayList<SegCurve>();
 	
 	private boolean dragging = false;	
+	
+	private void generatePath(){
+		path = new Path2D.Double();
+		path.moveTo(points[0].x, points[0].y);
+		double segVal = 1.0/(points.length-1);
+		double currentVal = 0;
+		for (int i = 0; i < points.length-1; i++) {
+		  	makeArch(points, points.length, i); 
+		  	SegCurve c = new SegCurve(P,Q,R,S,currentVal,currentVal+segVal);
+		  	curves.add(c);
+		  	currentVal += segVal;
+		  	path.curveTo(Q.x, Q.y, R.x, R.y, S.x, S.y);
+		}
+	}
 	
 	@Override
 	public double getMaxHeight() {
@@ -41,6 +56,26 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 	@Override
 	public double getMaxWidth() {
 		return width;
+	}
+	
+	@Override
+	public void setHBounds(double left, double right) {
+		tx = left;
+		slider.newTx = tx;
+        for (int i = 0; i < points.length; i++) {
+        	points[i].x = orgPoints[i].x+left;
+        }
+		generatePath();
+	}
+	
+	@Override
+	public void setVBounds(double top, double buttom) {
+		ty = top;
+		slider.newTy = ty;
+        for (int i = 0; i < points.length; i++) {
+        	points[i].y = orgPoints[i].y+top;
+        }
+		generatePath();
 	}
 	
 	@Override
@@ -78,25 +113,17 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		SA pointsArray = style.getArray("path");
         if(pointsArray != null) {
             points = new Point2D.Double[pointsArray.size()];
+            orgPoints = new Point2D.Double[pointsArray.size()]; 
             for (int i = 0; i < pointsArray.size(); i++) {
                 SO pointObj = pointsArray.getSO(i);
                 int x = (int) pointObj.getDouble("x");
                 int y = (int) pointObj.getDouble("y");
                 points[i] = new Point2D.Double(x,y);
+                orgPoints[i] = new Point2D.Double(x,y);
             }
         }
         
-		path = new Path2D.Double();
-		path.moveTo(points[0].x, points[0].y);
-		double segVal = 1.0/(points.length-1);
-		double currentVal = 0;
-		for (int i = 0; i < points.length-1; i++) {
-		  	makeArch(points, points.length, i); 
-		  	SegCurve c = new SegCurve(P,Q,R,S,currentVal,currentVal+segVal);
-		  	curves.add(c);
-		  	currentVal += segVal;
-		  	path.curveTo(Q.x, Q.y, R.x, R.y, S.x, S.y);
-		}
+        generatePath();
 		
 		SA modelsObj = style.getArray("model");
 		if(modelsObj != null){
@@ -128,7 +155,8 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
 		Selectable selectableSlider = (Selectable) slider;
-		ArrayList<Integer> selectPath = selectableSlider.select(x, y, 0, myTransform);
+		AffineTransform atf = new AffineTransform(myTransform);
+		ArrayList<Integer> selectPath = selectableSlider.select(x, y, 0, atf);
 		if(selectPath != null){
 			dragging = true;
 			return true;
