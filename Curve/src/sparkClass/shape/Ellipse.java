@@ -193,4 +193,17 @@ public class Ellipse extends SOReflect implements Drawable, Selectable, Interact
 		return top;
 	}
 
+	@Override
+	public Point2D getCenter() {
+		ArrayList<Point2D> controls = controls();
+		double totalX = 0;
+		double totalY = 0;
+		int size = controls.size();
+        for (int i = 0; i < size; i++) {
+        	totalX += controls.get(i).getX();
+        	totalY += controls.get(i).getY();
+        }
+		return new Point2D.Double(totalX/size, totalY/size);
+	}
+
 }

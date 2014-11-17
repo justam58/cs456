@@ -26,6 +26,10 @@ public class Polyline extends SOReflect implements Drawable, Selectable, Interac
 	public Color color = Color.black;
 	
 	private static final int HIT_BOX_SIZE = 3;
+	
+	public Polyline() {
+		super();
+	}
 
 	public Polyline(int[] xPoints, int[] yPoints, double thickness) {
 		super();
@@ -136,6 +140,18 @@ public class Polyline extends SOReflect implements Drawable, Selectable, Interac
 	@Override
 	public Root getPanel() {
 		return null;
+	}
+
+	@Override
+	public Point2D getCenter() {
+		double totalX = 0;
+		double totalY = 0;
+		int size = xPoints.length;
+        for (int i = 0; i < size; i++) {
+        	totalX += xPoints[i];
+        	totalY += yPoints[i];
+        }
+		return new Point2D.Double(totalX/size, totalY/size);
 	}
 
 }

@@ -108,5 +108,10 @@ public class Line extends SOReflect implements Drawable, Selectable, Interactabl
 	public Root getPanel() {
 		return null;
 	}
+
+	@Override
+	public Point2D getCenter() {
+		return new Point2D.Double((x1+x2)/2, (y1+y2)/2);
+	}
 	
 }

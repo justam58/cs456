@@ -3,6 +3,7 @@ package sparkClass;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import model.TreeNode;
 import able.Drawable;
@@ -180,6 +181,11 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	@Override
 	public Root getPanel() {
 		return this;
+	}
+
+	@Override
+	public Point2D getCenter() {
+		return content.getCenter();
 	}
 
 }

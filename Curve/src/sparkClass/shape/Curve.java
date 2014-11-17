@@ -145,6 +145,13 @@ public class Curve extends SOReflect implements Drawable, Selectable, Interactab
 		else{
 			isfilled = true;
 		}
+		
+		path = new Path2D.Double();
+		path.moveTo(points[0].x, points[0].y);
+		for (int i = 0; i < points.length-1; i++) {
+		  	makeArch(points, points.length, i); 
+		  	path.curveTo(Q.x, Q.y, R.x, R.y, S.x, S.y);
+		}
 	}
 	
 	@Override
@@ -153,12 +160,6 @@ public class Curve extends SOReflect implements Drawable, Selectable, Interactab
 			Graphics2D g2 = (Graphics2D)g;
 			g.setColor(border == null? Color.black : border);
 			g2.setStroke(new BasicStroke((int)thickness));
-			path = new Path2D.Double();
-			path.moveTo(points[0].x, points[0].y);
-			for (int i = 0; i < points.length-1; i++) {
-			  	makeArch(points, points.length, i); 
-			  	path.curveTo(Q.x, Q.y, R.x, R.y, S.x, S.y);
-			}
 			g2.draw(path);
 			if(fill != null){
 				g.setColor(fill);
@@ -207,6 +208,18 @@ public class Curve extends SOReflect implements Drawable, Selectable, Interactab
 			R.x = controlPoints[p+1].x - (-controlPoints[p].x + controlPoints[p+2].x)/6;
 			R.y = controlPoints[p+1].y - (-controlPoints[p].y + controlPoints[p+2].y)/6;
 		}
+	}
+
+	@Override
+	public Point2D getCenter() {
+		double totalX = 0;
+		double totalY = 0;
+		int size = xPoints.length;
+        for (int i = 0; i < size; i++) {
+        	totalX += xPoints[i];
+        	totalY += yPoints[i];
+        }
+		return new Point2D.Double(totalX/size, totalY/size);
 	}
 	
 }

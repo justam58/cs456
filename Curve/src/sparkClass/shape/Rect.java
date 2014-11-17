@@ -30,6 +30,10 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	public Color fill; // If there is no fill color then the rectangle is not filled. 
 	
 	private static final int HIT_BOX_SIZE = 3;
+	
+	public Rect() {
+		super();
+	}
 
 	public Rect(double left, double top, double width, double height) {
 		super();
@@ -215,6 +219,19 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 	@Override
 	public double getCurrentY() {
 		return top;
+	}
+
+	@Override
+	public Point2D getCenter() {
+		ArrayList<Point2D> controls = controls();
+		double totalX = 0;
+		double totalY = 0;
+		int size = controls.size();
+        for (int i = 0; i < size; i++) {
+        	totalX += controls.get(i).getX();
+        	totalY += controls.get(i).getY();
+        }
+		return new Point2D.Double(totalX/size, totalY/size);
 	}
 
 }

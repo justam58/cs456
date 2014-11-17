@@ -35,6 +35,10 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	private Rectangle boundingBox = null;
 	private FontMetrics fontMetrics;
 	public Root root = null;
+	
+	public Text() {
+		super();
+	}
 
 	public Text(String text, double x, double y, String font, double size, boolean edit, double cursor, ArrayList<String> models) {
 		super();
@@ -210,6 +214,11 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 
 	public void changeLabel(String label) {
 		text = label;
+	}
+
+	@Override
+	public Point2D getCenter() {
+		return new Point2D.Double(boundingBox.getCenterX(),boundingBox.getCenterY());
 	}
 
 }

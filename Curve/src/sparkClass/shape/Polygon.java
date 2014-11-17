@@ -157,4 +157,16 @@ public class Polygon extends SOReflect implements Drawable, Selectable, Interact
 		return null;
 	}
 
+	@Override
+	public Point2D getCenter() {
+		double totalX = 0;
+		double totalY = 0;
+		int size = xPoints.length;
+        for (int i = 0; i < size; i++) {
+        	totalX += xPoints[i];
+        	totalY += yPoints[i];
+        }
+		return new Point2D.Double(totalX/size, totalY/size);
+	}
+
 }
