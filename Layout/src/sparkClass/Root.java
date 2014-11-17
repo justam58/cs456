@@ -3,7 +3,9 @@ package sparkClass;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
+import listener.ModelListener;
 import model.TreeNode;
 import able.Drawable;
 import able.Interactable;
@@ -27,7 +29,26 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	
 	public Interactable focus = null;
 	
-	public TreeNode model = new TreeNode("","");
+	public TreeNode model = null;
+	
+	public void addModelListener(ArrayList<String> models, TreeNode current, int index, ModelListener listener){
+		if(model != null){
+			model.addListener(models, current, index, listener);
+		}
+	}
+	
+	public String getModelValue(ArrayList<String> models, TreeNode current, int index){
+		if(model != null){
+			return model.getValue(models,current,index);
+		}
+		return null;
+	}
+	
+	public void updateModel(ArrayList<String> models, TreeNode current, int index, String value){
+		if(model != null){
+			model.update(models, current, index, value);
+		}
+	}
 	
 	public void setKeyFocus(Interactable focus){
 		// When this method is called on a Root object 
@@ -64,10 +85,14 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	@Override
 	public void setStyle(SO style){
 		SV modelValue = style.get("model");
-		model = build(model,"model",modelValue);
-		model.print();
+		if(modelValue != null){
+			model = new TreeNode("","");
+			model = build(model,"model",modelValue);
+			model.print();
+		}
 		
-		SO contentsObj = style.getObj("contents");
+		SA contentsArray = style.getArray("contents");
+		SO contentsObj = contentsArray.getSO(0);;
 		Drawable shape = (Drawable)contentsObj;
 		shape.setStyle(contentsObj);
 		content = shape;
@@ -162,7 +187,9 @@ public class Root extends SOReflect implements Drawable, Interactable {
 			Interactable shape = (Interactable)content;
 			shape.mouseUp(x,y,getTransform());
 		}
-		model.print();
+		if(model != null){
+			model.print();	
+		}
 		return true;
 	}
 

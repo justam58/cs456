@@ -133,7 +133,7 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		}
 		
 		root = getPanel();	
-		root.model.addListener(models, root.model, 0, this);
+		root.addModelListener(models, root.model, 0, this);
 		
 		SO sliderObj = style.getObj("slider");
 		Drawable drawableSlider = (Drawable)sliderObj;
@@ -143,11 +143,14 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		
 		moveSliderTo(sliderVal);
 		
-		Object value = root.model.getValue(models, root.model, 0);
+		Object value = root.getModelValue(models, root.model, 0);
 		if(value != null){
-			double modelValue = java.lang.Double.valueOf(root.model.getValue(models, root.model, 0));
+			double modelValue = java.lang.Double.valueOf(root.getModelValue(models, root.model, 0));
 			sliderVal = modelValue;
 			moveSliderTo(modelValue);
+		}
+		else{
+			moveSliderTo(sliderVal);
 		}
 		
 	}
@@ -171,7 +174,10 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 			myTransform.transform(new Point2D.Double(x,y), endp);
 			
 			double newModelValue = findNearestPoint(endp);
-			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			sliderVal = newModelValue;
+			moveSliderTo(sliderVal);
+			root.updateModel(models, root.model, 0, String.valueOf(newModelValue));
+			root.repaint();
 			return true;
 		}
 		return false;

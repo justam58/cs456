@@ -107,7 +107,7 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 				if(selectPath != null){
 					updateState(false, true);
 					if(state.equals("active") && models.size() > 0){
-						root.model = root.model.update(models, root.model, 0, String.valueOf(value));
+						root.updateModel(models, root.model, 0, String.valueOf(value));
 					}
 					state = "idle";
 					return true;

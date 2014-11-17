@@ -80,14 +80,19 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		root = getPanel();
 		
 		Rect rect = new Rect(0,0,200,30);
-		Text text = new Text(root.model.getValue(models, root.model, 0),10,25,"serif",15,edit,cursor,models);
+		Object value = root.getModelValue(models, root.model, 0);
+		String valueString = "";
+		if(value != null){
+			valueString = (String) value;
+		}
+		Text text = new Text(valueString,10,25,"serif",15,edit,cursor,models);
 		contents.add(rect);
 		contents.add(text);
 		textBox = rect;
 		textContent = text;
 		textContent.root = root;
 		
-		root.model.addListener(models, root.model, 0, this);
+		root.addModelListener(models, root.model, 0, this);
 		ActiveListener listener = (ActiveListener)rect;
 		listeners.add(listener);
 		

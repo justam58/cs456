@@ -47,6 +47,8 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	private double barWidth = 20;
 	private double margin = 5;
 	
+	private double currentValue = sliderMin;
+	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
 			ActiveListener listener = listeners.get(i);
@@ -150,7 +152,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 		contents.add(arrowUp);
 		contents.add(arrowDown);
 		
-		root.model.addListener(models, root.model, 0, this);
+		root.addModelListener(models, root.model, 0, this);
 		ActiveListener listener = (ActiveListener)rectActive;
 		listeners.add(listener);
 		
@@ -173,9 +175,9 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 		downer = (Selectable)arrowDown;
 		activer = rectActive;
 		
-		Object value = root.model.getValue(models, root.model, 0);
+		Object value = root.getModelValue(models, root.model, 0);
 		if(value != null){
-			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			double modelValue = Double.valueOf(root.getModelValue(models, root.model, 0));
 			slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
 		}
 		
@@ -211,8 +213,9 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 			Point2D endp = new Point2D.Double();
 			myTransform.transform(new Point2D.Double(x,y), endp);
 
-			double newModelValue = valueToModel(slider.moveTo(endp.getX(), -1, sliderMax, sliderMin));
-			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			currentValue = slider.moveTo(endp.getX(), -1, sliderMax, sliderMin);
+			double newModelValue = valueToModel(currentValue);
+			root.updateModel(models, root.model, 0, String.valueOf(newModelValue));
 			state = "idle";
 			updateState(true, false);
 			return true;
@@ -240,23 +243,41 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 				ArrayList<Integer> selectPath = content.select(x, y, 0, myTransform);
 				if(selectPath != null){
 					updateState(false, true);
-					if(content.equals((Selectable)upper) && models.size() > 0){
-						String value = (String)root.model.getValue(models, root.model, 0);
-						Double newValue = Double.valueOf(value)+step;
-						if(newValue > max){
-							newValue = max;
+					if(content.equals((Selectable)upper)){
+						if(models.size() > 0){
+							String value = (String)root.getModelValue(models, root.model, 0);
+							Double newValue = Double.valueOf(value)+step;
+							if(newValue > max){
+								newValue = max;
+							}
+							root.updateModel(models, root.model, 0, newValue.toString());
+							slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
 						}
-						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
+						else{
+							currentValue += step;
+							if(currentValue > sliderMax){
+								currentValue = sliderMax;
+							}
+							slider.moveTo(currentValue, -1, sliderMax, sliderMin);
+						}
 					}
-					else if(content.equals((Selectable)downer) && models.size() > 0){
-						String value = (String)root.model.getValue(models, root.model, 0);
-						Double newValue = Double.valueOf(value)-step;
-						if(newValue < min){
-							newValue = min;
+					else if(content.equals((Selectable)downer)){
+						if(models.size() > 0){
+							String value = (String)root.getModelValue(models, root.model, 0);
+							Double newValue = Double.valueOf(value)-step;
+							if(newValue < min){
+								newValue = min;
+							}
+							root.updateModel(models, root.model, 0, newValue.toString());
+							slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
 						}
-						root.model = root.model.update(models, root.model, 0, newValue.toString());
-						slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
+						else{
+							currentValue -= step;
+							if(currentValue < sliderMin){
+								currentValue = sliderMin;
+							}
+							slider.moveTo(currentValue, -1, sliderMax, sliderMin);
+						}
 					}
 					state = "idle";
 					return true;
@@ -315,12 +336,19 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 		Polyline arrowDown = (Polyline)downer;
 		arrowDown.setXPoints(new int[]{(int) (left+barWidth-margin),(int) (left+margin),(int) (left+barWidth-margin)});
 		
+		double oldMin = sliderMin;
+		double oldMax = sliderMax;
+		
 		setSliderMaxAndMin();
 		
-		Object value = root.model.getValue(models, root.model, 0);
+		Object value = root.getModelValue(models, root.model, 0);
 		if(value != null){
-			double modelValue = Double.valueOf(root.model.getValue(models, root.model, 0));
+			double modelValue = Double.valueOf(root.getModelValue(models, root.model, 0));
 			slider.moveTo(valueFromModel(modelValue), -1, sliderMax, sliderMin);
+		}
+		else{
+			currentValue = (currentValue*(sliderMax-sliderMin))/(oldMax-oldMin);
+			slider.moveTo(currentValue, -1, sliderMax, sliderMin);
 		}
 	}
 

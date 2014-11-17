@@ -186,14 +186,14 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 		if((int)key == 8 && cursor > 0){// back space
 			text = text.substring(0,(int)cursor-1) + text.substring((int)cursor);
 			if(models != null){
-				root.model.update(models, root.model, 0, text);
+				root.updateModel(models, root.model, 0, text);
 			}
 			cursor--;
 		}
 		else{
 			text = text.substring(0,(int)cursor) + key + text.substring((int)cursor);
 			if(models != null){
-				root.model.update(models, root.model, 0, text);
+				root.updateModel(models, root.model, 0, text);
 			}
 			cursor++;
 		}
