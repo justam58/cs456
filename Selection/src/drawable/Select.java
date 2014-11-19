@@ -8,11 +8,34 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import spark.data.SA;
+import spark.data.SO;
+import spark.data.SV;
 import view.ContentPanel;
 
 public class Select extends Group implements Drawable, Selectable {
 	
-	public ArrayList<ArrayList<Integer>> selected = new ArrayList<ArrayList<Integer>>();
+	public ArrayList<Integer> selectedPath = null;
+	
+	@Override
+	public void setStyle(SO style){
+		SA contentsArray = style.getArray("contents");
+		for(int i = 0; i < contentsArray.size(); i++){
+			SO shapeObj = contentsArray.getSO(i);
+			Drawable shape = (Drawable)shapeObj;
+			shape.setStyle(shapeObj);
+			contents.add(shape);
+		}
+		
+		SA selectedArray = style.getArray("selected");
+		if(selectedArray != null){
+			selectedPath = new ArrayList<Integer>();
+			for(int i = 0; i < selectedArray.size(); i++){
+				SV integer = selectedArray.get(i);
+				selectedPath.add((int)integer.getDouble());
+			}
+		}
+	}
 	
 	@Override
 	public void paint(Graphics g) {
@@ -25,63 +48,56 @@ public class Select extends Group implements Drawable, Selectable {
 			g2d.rotate(-Math.toRadians(rotate));
 			g2d.scale(sx, sy);
 			shape.paint(g);
-    		// then check to see if it has a "selected" path. 
-			ArrayList<Integer> selectPath = selected.get(i);
-			// If it does then it should find that object using the path 
-			if(selectPath != null){
-				// retrieve its control points using the controls() method 
-				Selectable currentShape = (Selectable)shape;
-				int currentIndex = 0;
-				while(currentShape instanceof Group)
-				{
-					Group group = (Group)currentShape;
-					currentShape = (Selectable) group.contents.get(currentIndex);
-					currentIndex++;
-				}
-				ArrayList<Point2D> controlPoints = currentShape.controls();
-				// draw the control points.
-				drawControls(g2d, controlPoints);
-			}
 			g2d.setTransform(atf);
-			// Note that this must correctly handle the transformations of any nested groups.
+		}
+		// then check to see if it has a "selected" path. 
+		// If it does then it should find that object using the path 
+		if(selectedPath != null){
+			Selectable currentShape = (Selectable)this;
+			for(int i = 0; i < selectedPath.size(); i++){
+				int childIndex = selectedPath.get(i);
+				if(!(currentShape instanceof Group) && !(currentShape instanceof Select)){
+					selectedPath = null;
+					return;
+				}
+				Group group = (Group)currentShape;
+				Drawable shape = group.contents.get(childIndex);
+				if(shape instanceof Polygon){
+					selectedPath = null;
+					return;
+				}
+				currentShape = (Selectable)shape;
+			}
+			ArrayList<Point2D> controlPoints = currentShape.controls();
+			// draw the control points.
+			AffineTransform atf = g2d.getTransform();
+			g2d.translate(tx, ty);
+			g2d.rotate(-Math.toRadians(rotate));
+			g2d.scale(sx, sy);
+			drawControls(g2d, controlPoints);
+			g2d.setTransform(atf);
 		}
 	}
 
 	@Override
 	public ArrayList<Integer> select(double x, double y, int myIndex, AffineTransform transform) {
-		// behave as a Group (see below) 
-		// if the object or its contents are selected then it returns a path to the selected object. 
-		// The x, y coordinates are in the coordinates of your panel, not in the transformed coordinates. 
-		// If the object or its contents are not selected, then NULL is returned.
-		for(int i = 0; i < contents.size(); i++){
-			// recursively call select on its contents
+		for(int i = contents.size()-1; i >=0 ; i--){
 			Drawable content = contents.get(i);
 			if(content instanceof Selectable){
-				// Be sure to correctly account for the transformation by transforming the selection point by the inverse of the transformation on this group and by pass
-				// That will bring the selection point into the coordinate system of the group contents
-				AffineTransform atf = new AffineTransform();
+				AffineTransform atf = new AffineTransform(transform);
 				atf.scale(1/sx, 1/sy);
 				atf.rotate(Math.toRadians(rotate));
 				atf.translate(-tx, -ty);
 				Selectable shape = (Selectable)content;
 				ArrayList<Integer> selectPath = shape.select(x,y,i,atf);
-				// If any of the contents are selected 
-				// then this should take the selection path from the selected child and add this group's index onto the front and return the more complete path.
-				// but should also store the path returned by its child selection in its "selected" attribute
-				// If its selected attribute changes
-				// it should also call repaint() to make certain the control points are correctly updated on the screen using the paint method.
-				if(!equalsTo(selected.get(i),(selectPath))){
-					selected.set(i, selectPath);
+				if(selectPath != null && !equalsTo(selectPath,selectedPath)){
+					selectedPath = selectPath;
 					ContentPanel.getInstance().repaint();
+					return selectPath;
 				}
-//				if(selectPath != null){
-//					selectPath.add(0, myIndex);
-//					System.out.println(myIndex);
-//					System.out.println(selectPath);
-////					return selectPath;
-//				}
 			}
 		}
+		selectedPath = null;
 		return null;
 	}
 	
