@@ -10,6 +10,7 @@ import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
 import spark.data.SParented;
+import spark.data.SV;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
@@ -24,7 +25,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	public Color idle;
 	public Color hover;
 	public Color active;
-	public double value;
+	public String valueToSet;
 	
 	private ArrayList<ActiveListener> listeners = new ArrayList<ActiveListener>();
 	private Root root = null;
@@ -96,7 +97,7 @@ public class Button extends SOReflect implements Drawable, Interactable {
 				if(selectPath != null){
 					updateState(false, true);
 					if(state.equals("active") && models.size() > 0){
-						root.model = root.model.update(models, root.model, 0, String.valueOf(value));
+						root.model = root.model.update(models, root.model, 0, String.valueOf(valueToSet));
 					}
 					state = "idle";
 					return true;
@@ -124,6 +125,22 @@ public class Button extends SOReflect implements Drawable, Interactable {
 	
 	@Override
 	public void setStyle(SO style) {
+		SV valueValue = style.get("value");
+		if(valueValue != null){
+			if(valueValue.isString()){
+				valueToSet = valueValue.getString();
+			}
+			else if(valueValue.isDouble()){
+				valueToSet = String.valueOf(valueValue.getDouble());
+			}
+			else if(valueValue.isLong()){
+				valueToSet = String.valueOf(valueValue.getLong());
+			}
+			else if(valueValue.isBoolean()){
+				valueToSet = String.valueOf(valueValue.isTrue());
+			}
+		}
+		
 		SA contentsArray = style.getArray("contents");
 		for(int i = 0; i < contentsArray.size(); i++){
 			SO shapeObj = contentsArray.getSO(i);

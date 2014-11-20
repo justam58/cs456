@@ -112,8 +112,18 @@ public class TextBox extends SOReflect implements Interactable, Drawable, ModelL
 			}
 			if(classVal != null && classVal.equals("content")){
 				textContent = (Text)shape;
-				textContent.edit = this.edit;
-				textContent.cursor = this.cursor;
+				if(textContent.edit){
+					this.edit = textContent.edit;
+				}
+				if(this.edit){
+					textContent.edit = this.edit;
+				}
+				if(textContent.cursor != -1){
+					this.cursor = textContent.cursor;
+				}
+				if(this.cursor != -1){
+					textContent.cursor = this.cursor;
+				}
 				textContent.models = this.models;
 				textContent.text = root.model.getValue(models, root.model, 0);
 			}
