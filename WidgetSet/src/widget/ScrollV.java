@@ -211,8 +211,11 @@ public class ScrollV extends SOReflect implements Interactable, Drawable, ModelL
 			
 			double d_delta = (endp.getY() - d_dragStart);
 			d_dragStart = endp.getY();
-			double newModelValue = valueToModel(slider.move(0, d_delta, sliderMax, sliderMin));
-			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			double v = slider.move(0, d_delta, sliderMax, sliderMin);
+			if(v != -1){
+				double newModelValue = valueToModel(v);
+				root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			}
 			state = "idle";
 			updateState(true, false);
 			return true;

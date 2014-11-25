@@ -165,10 +165,13 @@ public class Rect extends SOReflect implements Drawable, Selectable, Interactabl
 			top = top < min ? min : top;
 			return top;
 		}
-		left += dx;
-		left = left > max ? max : left;
-		left = left < min ? min : left;
-		return left;
+		if(dx != 0){
+			left += dx;
+			left = left > max ? max : left;
+			left = left < min ? min : left;
+			return left;
+		}
+		return -1;
 	}
 	
 	@Override

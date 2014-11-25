@@ -211,8 +211,11 @@ public class ScrollH extends SOReflect implements Interactable, Drawable, ModelL
 			
 			double d_delta = (endp.getX() - d_dragStart);
 			d_dragStart = endp.getX();
-			double newModelValue = valueToModel(slider.move(d_delta, 0, sliderMax, sliderMin));
-			root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			double v = slider.move(d_delta, 0, sliderMax, sliderMin);
+			if(v != -1){
+				double newModelValue = valueToModel(v);
+				root.model = root.model.update(models, root.model, 0, String.valueOf(newModelValue));
+			}
 			state = "idle";
 			updateState(true, false);
 			return true;
