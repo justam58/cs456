@@ -1,0 +1,20 @@
+Select{ contents:[
+		Group { contents:[
+				Rect{ left:5,top:10,width:30, height:50, thickness:1, border:{r:0,g:0,b:0} },
+				Rect{ left:30,top:30,width:30, height:50, thickness:1, 
+					border:{r:0,g:0,b:0}, fill:{r:100,g:100,b:200} },
+				Ellipse{ left:5,top:70,width:30, height:50, thickness:1, border:{r:0,g:0,b:0} },
+				Ellipse{ left:30,top:90,width:30, height:50, thickness:1, 
+					border:{r:0,g:0,b:0}, fill:{r:100,g:100,b:200} }
+			],
+			sx:1.0, sy:0.5, tx:-400, ty:-500, rotate:-45
+		},
+		Line{x1:10,y1:20,x2:30, y2:40, thickness:3, color:{r:255,g:255,b:0} },
+		Text{ text:"Hello", x:5,y:180,font:"sans-serif",size:10 },
+		Polyline{ points:[ {x:40,y:10}, {x:50,y:20}, {x:60,y:10} ],
+			thickness:4, color:{r:100,g:255,b:100} },
+		Polygon{ points:[ {x:5,y:220}, {x:35,y:220}, {x:20,y:250} ],
+			thickness:2, border:{r:0,g:0,b:0}, fill:{r:200,g:200,b:255} }
+	], selected: [0,1],
+	sx:1.0, sy:2.0, tx:400, ty:500, rotate:45
+}

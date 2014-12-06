@@ -1,0 +1,22 @@
+Root{
+	contents:[
+		Button{ label:"20", state:"idle", idle:{r:255,g:255,b:255}, hover:{r:200,g:200,b:255},
+			active:{r:255,g:255,b:200}, model:["location", "street"], value:"Farmington",
+			contents:[
+				Rect{ class:"active", left:10, top:10, width:300, height:200, thickness:2, 
+					border:{r:0,g:0,b:100}
+				},
+				Text{ class:"label", text:"wrong", x:120,y:250, font:"sans-serif",size:30 }
+			]
+		},
+
+		TextBox{state:"idle", idle:{r:200,g:200,b:200}, hover:{r:200,g:200,b:255},
+			active:{r:255,g:255,b:200}, model:["location","street"],
+			contents:[
+				Rect{ class:"active",left:100, top:400, width:400, height:200, fill:{r:255,g:255,b:255}},
+				Text{ edit:true, class:"content", text:"wrong", x:120,y:550, font:"serif",size:10 }
+			]
+		}
+	],
+	model:{ size:10, location:{ number:144, street:"Inglewood" }, age:55 }
+}
