@@ -1,0 +1,18 @@
+Root{ contents:[
+	Columns{ contents:[
+		Button{ label:"Long label", state:"idle",idle:{r:128,g:128,b:128},
+			hover:{r:200,g:200,b:200}, active:{r:250,g:250,b:20}
+		},
+		Button{ label:"Short", state:"idle",idle:{r:128,g:128,b:128},
+			hover:{r:200,g:200,b:200}, active:{r:250,g:250,b:20}
+		},
+		Button{ label:"Hey this is long", state:"idle",idle:{r:128,g:128,b:128},
+			hover:{r:200,g:200,b:200}, active:{r:250,g:250,b:20}
+		},
+		Button{ label:"wide", state:"idle",idle:{r:128,g:128,b:128},
+			hover:{r:200,g:200,b:200}, active:{r:250,g:250,b:20}, columnSpan:2
+		}
+		], nColumns:3, gutter:20
+	}
+	]
+}

@@ -9,6 +9,7 @@ import able.Layout;
 import spark.data.SA;
 import spark.data.SO;
 import spark.data.SOReflect;
+import spark.data.SV;
 import sparkClass.Group;
 
 public class Columns extends Group implements Layout, Drawable, Interactable {
@@ -202,10 +203,10 @@ public class Columns extends Group implements Layout, Drawable, Interactable {
 			contents.add(shape);
 			
 			SOReflect shapeSOR = (SOReflect)shape;
-			String classVal = shapeSOR.getString("columnSpan");
+			SV classVal = shapeSOR.get("columnSpan");
 			double columnSpan = 1;
 			if(classVal != null && classVal.equals("columnSpan")){
-				columnSpan = Double.valueOf(classVal);
+				columnSpan = shapeSOR.getLong("columnSpan");
 			}
 			this.columnSpan.add(columnSpan);
 		}

@@ -174,7 +174,7 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 	
 	@Override
 	public double getMinWidth() {
-		return fontMetrics.stringWidth(label) + marginWidth*2;
+		return fontMetrics.stringWidth(label);
 	}
 
 	@Override
