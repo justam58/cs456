@@ -1,0 +1,30 @@
+Root{
+	contents:[ VStack{ contents:[
+		Button{ label:"zero", state:"idle", idle:{r:255,g:255,b:255}, hover:{r:200,g:200,b:255},
+			active:{r:255,g:255,b:200}, model:["size" ], value:0.0,
+			contents:[
+				Rect{ class:"active", left:10, top:610, width:300, height:200, thickness:2, 
+					border:{r:0,g:0,b:100}
+				},
+				Text{ class:"label", text:"wrong", x:720,y:250, font:"sans-serif",size:30 }
+			]
+		},
+
+		Path{ path: [ {x:500,y:100}, {x:100,y:300}, {x:600,y:400}, {x:700,y:500} ],
+			contents: [ 
+				Curve{ points: [ {x:500,y:100}, {x:100,y:300}, {x:600,y:400}, {x:700,y:500} ],
+						border:{r:255,g:0,b:0}, thickness:4
+					}
+				],
+			slider: Group{ contents: [
+						Polygon{ points:[ {x:0,y:-50}, {x:20,y:-20}, {x:40,y:-20}, {x:40,y:10}, 
+								{x:0,y:20}, {x:-40,y:10}, {x:-40,y:-20}, {x:-20,y:20}],
+								fill:{r:100, g:100, b:255}
+						}
+					]
+				},
+			sliderVal:1.0, width:800, height:600, model:[ "size" ]
+		} ] }
+	],
+	model:{ size:0.5, location:{ number:144, street:"Inglewood" }, age:55 }
+}
