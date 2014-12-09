@@ -16,16 +16,21 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import able.Drawable;
+import able.Interactable;
 import spark.data.SO;
 import spark.data.SV;
 import spark.data.io.SONReader;
+import sparkClass.Group;
 import sparkClass.Root;
+import sparkClass.Select;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame{
 	
 	private JMenuItem openMenuItem;
 	private ContentPanel contentPanel;
+	private SO style;
 	
     public MainFrame() {
     	// setup
@@ -76,7 +81,7 @@ public class MainFrame extends JFrame{
                         String[] sparkClasses = new String[]{"sparkClass.widget","sparkClass.shape","sparkClass.layout","sparkClass"};
                         SONReader reader = new SONReader(sparkClasses, new FileInputStream(file));
                         SV sv = reader.read();
-                        SO style = sv.getSO();
+                        style = sv.getSO();
                         Root root = (Root) style;
                         root.setStyle(style);
                         contentPanel.setRoot(root);
@@ -88,10 +93,17 @@ public class MainFrame extends JFrame{
                     		    "SON Parsing Error",
                     		    JOptionPane.ERROR_MESSAGE);
                     } catch (ClassCastException e1){
-                    	JOptionPane.showMessageDialog(null,
-                    		    "There should be a ROOT at the root level.",
-                    		    "SON Parsing Error",
-                    		    JOptionPane.ERROR_MESSAGE);
+                    	if(!(style instanceof Group) || !(style instanceof Select)){
+                        	JOptionPane.showMessageDialog(null,
+                        		    "There should be a Root or Group or Select at the root level.",
+                        		    "SON Parsing Error",
+                        		    JOptionPane.ERROR_MESSAGE);
+                        	return;
+                    	}
+                    	Drawable drawable = (Drawable) style;
+                    	drawable.setStyle(style);
+                    	Interactable root = (Interactable) style;
+                    	contentPanel.setRoot(root);
                     }
                 }
 	        }

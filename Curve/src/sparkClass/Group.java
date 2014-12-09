@@ -126,6 +126,7 @@ public class Group extends SOReflect implements Drawable, Selectable, Interactab
 
 	@Override
 	public boolean mouseDown(double x, double y, AffineTransform myTransform) {
+
 		AffineTransform atf = new AffineTransform(myTransform);
 		atf.scale(1/sx, 1/sy);
 		atf.rotate(Math.toRadians(rotate));

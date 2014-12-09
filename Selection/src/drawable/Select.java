@@ -90,7 +90,7 @@ public class Select extends Group implements Drawable, Selectable {
 				atf.translate(-tx, -ty);
 				Selectable shape = (Selectable)content;
 				ArrayList<Integer> selectPath = shape.select(x,y,i,atf);
-				if(selectPath != null && !equalsTo(selectPath,selectedPath)){
+				if(selectPath != null){
 					selectedPath = selectPath;
 					ContentPanel.getInstance().repaint();
 					return selectPath;
@@ -98,25 +98,8 @@ public class Select extends Group implements Drawable, Selectable {
 			}
 		}
 		selectedPath = null;
+		ContentPanel.getInstance().repaint();
 		return null;
-	}
-	
-	private boolean equalsTo(ArrayList<Integer> p1, ArrayList<Integer> p2){
-		if(p1 == null && p2 == null){
-			return true;
-		}
-		if(p1 == null || p2 == null){
-			return false;
-		}
-		if(p1.size() != p2.size()){
-			return false;
-		}
-		for(int i = 0; i < p1.size(); i++){
-			if(p1.get(i) != p2.get(i)){
-				return false;
-			}
-		}
-		return true;
 	}
 	
 	private void drawControls(Graphics2D g, ArrayList<Point2D> controlPoints){

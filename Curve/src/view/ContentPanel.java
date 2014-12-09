@@ -14,6 +14,8 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JPanel;
 
+import able.Drawable;
+import able.Interactable;
 import sparkClass.Root;
 
 @SuppressWarnings("serial")
@@ -26,7 +28,7 @@ public class ContentPanel extends JPanel {
         return instance;
     }
 	
-	public Root root = null;
+	public Interactable root = null;
 	
 	private boolean painted = false;
 	private boolean initSize = false;
@@ -35,7 +37,7 @@ public class ContentPanel extends JPanel {
 		super();
 	}
 	
-	public void setRoot(Root root){
+	public void setRoot(Interactable root){
 		this.root = root;
 		this.addMouseListener(mouseListener);
 		this.addMouseMotionListener(mouseMotionListner);
@@ -128,7 +130,10 @@ public class ContentPanel extends JPanel {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			Component c = e.getComponent();
-			root.resize(c.getWidth(), c.getHeight());
+			if(root instanceof Root){
+				Root r = (Root) root;
+				r.resize(c.getWidth(), c.getHeight());
+			}
 		}
 
 		@Override
@@ -153,10 +158,12 @@ public class ContentPanel extends JPanel {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		if(root != null){
-			root.paint(g);
+			Drawable drawable = (Drawable) root;
+			drawable.paint(g);
 			painted = true;
-			if(!initSize){
-				root.resize(getWidth(), getHeight());
+			if(!initSize && root instanceof Root){
+				Root r = (Root) root;
+				r.resize(getWidth(), getHeight());
 				initSize = true;
 			}
 		}
