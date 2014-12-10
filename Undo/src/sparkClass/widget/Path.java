@@ -7,6 +7,8 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import command.SetCommand;
+
 import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
@@ -33,6 +35,8 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 	private ArrayList<SegCurve> curves = new ArrayList<SegCurve>();
 	
 	private boolean dragging = false;	
+	
+	private String previousValue;
 	
 	private void generatePath(){
 		path = new Path2D.Double();
@@ -146,6 +150,14 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		Object value = root.getModelValue(models, root.model, 0);
 		if(value != null){
 			double modelValue = java.lang.Double.valueOf(root.getModelValue(models, root.model, 0));
+			if(modelValue > 1){
+				modelValue = 1;
+				root.updateModel(models, root.model, 0, String.valueOf(modelValue));
+			}
+			if(modelValue < 0){
+				modelValue = 0;
+				root.updateModel(models, root.model, 0, String.valueOf(modelValue));
+			}
 			sliderVal = modelValue;
 			moveSliderTo(modelValue);
 		}
@@ -162,6 +174,7 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		ArrayList<Integer> selectPath = selectableSlider.select(x, y, 0, atf);
 		if(selectPath != null){
 			dragging = true;
+			previousValue = root.getModelValue(models, root.model, 0);
 			return true;
 		}
 		return false;
@@ -185,7 +198,18 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		dragging = false;
+		if(dragging){
+			Point2D endp = new Point2D.Double();
+			myTransform.transform(new Point2D.Double(x,y), endp);
+			
+			double newModelValue = findNearestPoint(endp);
+			sliderVal = newModelValue;
+			moveSliderTo(sliderVal);
+			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue));
+			c.setPreviousValue(previousValue);
+			root.doIt(c);
+			dragging = false;
+		}
 		return false;
 	}
 

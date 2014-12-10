@@ -5,6 +5,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
+import command.SetCommand;
+
 import listener.ActiveListener;
 import listener.ModelListener;
 import spark.data.SA;
@@ -48,6 +50,8 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 	private double margin = 5;
 	
 	private double currentValue = -1;
+	
+	private double previousValue = -1;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size(); i++){
@@ -199,6 +203,7 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
+						previousValue = Double.valueOf(root.getModelValue(models, root.model, 0));
 					}
 					return true;
 				}
@@ -236,7 +241,16 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 
 	@Override
 	public boolean mouseUp(double x, double y, AffineTransform myTransform) {
-		dragging = false;
+		if(dragging){
+			Point2D endp = new Point2D.Double();
+			myTransform.transform(new Point2D.Double(x,y), endp);
+			double newModelValue = valueToModel(currentValue);
+			root.updateModel(models, root.model, 0, String.valueOf(newModelValue));
+			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue));
+			c.setPreviousValue(String.valueOf(previousValue));
+			root.doIt(c);
+			dragging = false;
+		}
 		for(int i = contents.size()-1; i >= 0; i--){
 			if(contents.get(i) instanceof Selectable){
 				Selectable content = (Selectable)contents.get(i);
@@ -250,7 +264,8 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 							if(newValue > max){
 								newValue = max;
 							}
-							root.updateModel(models, root.model, 0, newValue.toString());
+							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()));
+							root.doIt(c);
 							slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
 						}
 						else{
@@ -268,7 +283,8 @@ public class ScrollH extends Group implements Interactable, Drawable, ModelListe
 							if(newValue < min){
 								newValue = min;
 							}
-							root.updateModel(models, root.model, 0, newValue.toString());
+							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()));
+							root.doIt(c);
 							slider.moveTo(valueFromModel(newValue), -1, sliderMax, sliderMin);
 						}
 						else{

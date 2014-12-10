@@ -5,9 +5,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import listener.ModelListener;
 import model.TreeNode;
+import able.Command;
 import able.Drawable;
 import able.Interactable;
 import able.Layout;
@@ -31,6 +33,40 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	public Interactable focus = null;
 	
 	public TreeNode model = null;
+	
+	private Stack<Command> doneCommands = new Stack<Command>();
+	
+	private Stack<Command> undoneCommands = new Stack<Command>();
+	
+	public void doIt(Command c){
+		doneCommands.push(c);
+		c.doIt();
+		undoneCommands.clear();
+	}
+	
+	public void undo(){
+		if(!doneCommands.empty()){
+			Command c = doneCommands.pop();
+			c.undo();
+			undoneCommands.push(c);
+		}
+		if(model != null){
+			model.print();
+		}
+		repaint();
+	}
+	
+	public void redo(){
+		if(!undoneCommands.empty()){
+			Command c = undoneCommands.pop();
+			c.redo();
+			doneCommands.push(c);
+		}
+		if(model != null){
+			model.print();
+		}
+		repaint();
+	}
 	
 	public void addModelListener(ArrayList<String> models, TreeNode current, int index, ModelListener listener){
 		if(model != null){

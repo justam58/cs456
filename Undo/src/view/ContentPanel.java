@@ -37,6 +37,20 @@ public class ContentPanel extends JPanel {
 		super();
 	}
 	
+	public void undo(){
+		if(root != null){
+			Root r = (Root)root;
+			r.undo();
+		}
+	}
+	
+	public void redo(){
+		if(root != null){
+			Root r = (Root)root;
+			r.redo();
+		}
+	}
+	
 	public void setRoot(Interactable root){
 		this.root = root;
 		this.addMouseListener(mouseListener);
@@ -115,6 +129,15 @@ public class ContentPanel extends JPanel {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
+            if ((e.getKeyCode() == KeyEvent.VK_Z) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+                return;
+            }
+            if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+                return;
+            }
+            if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+                return;
+            }
 			root.key(e.getKeyChar());
 		}
 

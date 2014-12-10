@@ -29,10 +29,10 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 	public Color idle;
 	public Color hover;
 	public Color active;
-	public boolean edit;
+	public boolean edit = true;
 	public double cursor = -1;
 	
-	public double desiredChars;
+	public double desiredChars = 10;
 	
 	private Text textContent;
 	private Rect textBox;
@@ -80,10 +80,13 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		root = getPanel();
 		
 		Rect rect = new Rect(0,0,200,30);
-		Object value = root.getModelValue(models, root.model, 0);
-		String valueString = "";
-		if(value != null){
-			valueString = (String) value;
+		String valueString = "something";
+		if(models.size() > 0){
+			Object value = root.getModelValue(models, root.model, 0);
+			if(value != null){
+				valueString = (String) value;
+			}
+			root.addModelListener(models, root.model, 0, this);
 		}
 		Text text = new Text(valueString,10,25,"serif",15,edit,cursor,models);
 		contents.add(rect);
@@ -92,7 +95,6 @@ public class TextBox extends Group implements Interactable, Drawable, ModelListe
 		textContent = text;
 		textContent.root = root;
 		
-		root.addModelListener(models, root.model, 0, this);
 		ActiveListener listener = (ActiveListener)rect;
 		listeners.add(listener);
 		

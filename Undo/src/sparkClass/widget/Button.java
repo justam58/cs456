@@ -7,6 +7,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
+import command.SetCommand;
+
 import listener.ActiveListener;
 import spark.data.SA;
 import spark.data.SO;
@@ -108,7 +110,9 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 				if(selectPath != null){
 					updateState(false, true);
 					if(state.equals("active") && models.size() > 0){
-						root.updateModel(models, root.model, 0, String.valueOf(valueToSet));
+//						root.updateModel(models, root.model, 0, String.valueOf(valueToSet));
+						SetCommand c = new SetCommand(root,models,String.valueOf(valueToSet));
+						root.doIt(c);
 					}
 					state = "idle";
 					return true;

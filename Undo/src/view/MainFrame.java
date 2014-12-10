@@ -14,6 +14,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import able.Drawable;
@@ -29,15 +30,17 @@ import sparkClass.Select;
 public class MainFrame extends JFrame{
 	
 	private JMenuItem openMenuItem;
+	private JMenuItem undoMenuItem;
+	private JMenuItem redoMenuItem;
 	private ContentPanel contentPanel;
 	private SO style;
 	
     public MainFrame() {
     	// setup
-        super("Curves");
+        super("Undo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(800, 600));
-    	setSize(new Dimension(800, 600));
+        setPreferredSize(new Dimension(1000, 1000));
+    	setSize(new Dimension(1000, 1000));
 
         // place the frame in the middle
     	GraphicsConfiguration gc = getGraphicsConfiguration();  
@@ -60,11 +63,23 @@ public class MainFrame extends JFrame{
     private void createMenuBar(){
     	JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        JMenu menu = new JMenu("File");
-        menuBar.add(menu);
+        JMenu fileMenu = new JMenu("File");
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(fileMenu);
+        menuBar.add(editMenu);
         openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(actionListener);
-        menu.add(openMenuItem);
+        fileMenu.add(openMenuItem);
+        
+        undoMenuItem = new JMenuItem("Undo");
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.Event.CTRL_MASK));
+        undoMenuItem.addActionListener(actionListener);
+        editMenu.add(undoMenuItem);
+        
+        redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.Event.CTRL_MASK));
+        redoMenuItem.addActionListener(actionListener);
+        editMenu.add(redoMenuItem);
     }
     
     private ActionListener actionListener = new ActionListener() {
@@ -106,6 +121,12 @@ public class MainFrame extends JFrame{
                     	contentPanel.setRoot(root);
                     }
                 }
+	        }
+	        if (e.getSource() == undoMenuItem) {
+	        	contentPanel.undo();
+	        }
+	        if (e.getSource() == redoMenuItem) {
+	        	contentPanel.redo();
 	        }
 	    }
     };
