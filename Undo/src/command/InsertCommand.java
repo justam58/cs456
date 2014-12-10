@@ -6,7 +6,7 @@ import sparkClass.Root;
 import sparkClass.shape.Text;
 import able.Command;
 
-public class DeleteCommand implements Command {
+public class InsertCommand implements Command {
 	
 	private String valueToSet;
 	private ArrayList<String> path;
@@ -15,7 +15,7 @@ public class DeleteCommand implements Command {
 	private double cursor;
 	private Text textObject;
 	
-	public DeleteCommand(Root root, ArrayList<String> path, String valueToSet, double cursor, Text textObject){
+	public InsertCommand(Root root, ArrayList<String> path, String valueToSet, double cursor, Text textObject){
 		this.root = root;
 		this.path = path;
 		this.valueToSet = valueToSet;
@@ -29,7 +29,7 @@ public class DeleteCommand implements Command {
 			previousValue = root.getModelValue(path, root.model, 0);
 		}
 		if(textObject.cursor >= 0){
-			textObject.cursor = cursor-1;
+			textObject.cursor = cursor+1;
 		}
 		root.updateModel(path, root.model, 0, valueToSet);
 	}

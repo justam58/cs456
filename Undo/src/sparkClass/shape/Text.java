@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import command.DeleteCommand;
+import command.InsertCommand;
 import able.Drawable;
 import able.Interactable;
 import able.Selectable;
@@ -189,15 +190,13 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 			if(models != null){
 				DeleteCommand c = new DeleteCommand(root,models,text,cursor,this);
 				root.doIt(c);
-//				root.updateModel(models, root.model, 0, text);
 			}
 			cursor--;
 		}
 		else{
 			text = text.substring(0,(int)cursor) + key + text.substring((int)cursor);
 			if(models != null){
-//				root.updateModel(models, root.model, 0, text);
-				DeleteCommand c = new DeleteCommand(root,models,text,cursor,this);
+				InsertCommand c = new InsertCommand(root,models,text,cursor,this);
 				root.doIt(c);
 			}
 			cursor++;

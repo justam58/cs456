@@ -1,16 +1,16 @@
 Root{ contents:[
 	VStack{
 		contents:[
-			Button{ label:"20", state:"idle", idle:{r:255,g:255,b:255}, hover:{r:200,g:200,b:255},
-				active:{r:255,g:255,b:200}, model:["size"], value:20
+			Button{ label:"0", state:"idle", idle:{r:255,g:255,b:255}, hover:{r:200,g:200,b:255},
+				active:{r:255,g:255,b:200}, model:["size"], value:0
 
 			},
 			ScrollV{ state:"idle", idle:{r:200,g:200,b:200}, hover:{r:200,g:200,b:255},
-				active:{r:255,g:255,b:200}, max:50, min:0, step:1, model:["size"]
+				active:{r:255,g:255,b:200}, max:1, min:0, step:0.1, model:["size"]
 
 			},
 			ScrollH{state:"idle", idle:{r:200,g:200,b:200}, hover:{r:200,g:200,b:255},
-				active:{r:255,g:255,b:200}, max:100, min:0, step:1, model:["size"]
+				active:{r:255,g:255,b:200}, max:1, min:0, step:0.2, model:["size"]
 			},
 
 			TextBox{state:"idle", idle:{r:200,g:200,b:200}, hover:{r:200,g:200,b:255},
@@ -29,7 +29,7 @@ Root{ contents:[
 							}
 						]
 					},
-				sliderVal:1.0, width:800, height:600, model:[ "location", "number" ]
+				sliderVal:1.0, width:800, height:600, model:["size"]
 			}
 		]
 	} 
