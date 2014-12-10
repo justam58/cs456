@@ -111,7 +111,7 @@ public class Button extends Group implements Drawable, Interactable, Layout {
 					updateState(false, true);
 					if(state.equals("active") && models.size() > 0){
 //						root.updateModel(models, root.model, 0, String.valueOf(valueToSet));
-						SetCommand c = new SetCommand(root,models,String.valueOf(valueToSet));
+						SetCommand c = new SetCommand(root,models,String.valueOf(valueToSet),null);
 						root.doIt(c);
 					}
 					state = "idle";

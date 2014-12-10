@@ -8,7 +8,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import command.SetCommand;
-
 import listener.ModelListener;
 import spark.data.SA;
 import spark.data.SO;
@@ -175,6 +174,9 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 		if(selectPath != null){
 			dragging = true;
 			previousValue = root.getModelValue(models, root.model, 0);
+			if(previousValue == null){
+				previousValue = String.valueOf(sliderVal);
+			}
 			return true;
 		}
 		return false;
@@ -205,7 +207,10 @@ public class Path extends Group implements Interactable, Drawable, ModelListener
 			double newModelValue = findNearestPoint(endp);
 			sliderVal = newModelValue;
 			moveSliderTo(sliderVal);
-			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue));
+			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue),this);
+			if(models.size() <= 0){
+				c.setValueToSet(String.valueOf(sliderVal));
+			}
 			c.setPreviousValue(previousValue);
 			root.doIt(c);
 			dragging = false;

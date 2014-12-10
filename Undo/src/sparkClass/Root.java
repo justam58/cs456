@@ -69,20 +69,20 @@ public class Root extends SOReflect implements Drawable, Interactable {
 	}
 	
 	public void addModelListener(ArrayList<String> models, TreeNode current, int index, ModelListener listener){
-		if(model != null){
+		if(model != null && models.size() > 0){
 			model.addListener(models, current, index, listener);
 		}
 	}
 	
 	public String getModelValue(ArrayList<String> models, TreeNode current, int index){
-		if(model != null){
+		if(model != null && models.size() > 0){
 			return model.getValue(models,current,index);
 		}
 		return null;
 	}
 	
 	public void updateModel(ArrayList<String> models, TreeNode current, int index, String value){
-		if(model != null){
+		if(model != null && models.size() > 0){
 			model.update(models, current, index, value);
 		}
 	}

@@ -32,6 +32,9 @@ public class DeleteCommand implements Command {
 			textObject.cursor = cursor-1;
 		}
 		root.updateModel(path, root.model, 0, valueToSet);
+		if(path.size() <= 0){
+			textObject.text = valueToSet;
+		}
 	}
 
 	@Override
@@ -40,6 +43,9 @@ public class DeleteCommand implements Command {
 			textObject.cursor = cursor;
 		}
 		root.updateModel(path, root.model, 0, previousValue);
+		if(path.size() <= 0){
+			textObject.text = previousValue;
+		}
 	}
 	
 	public void setPreviousValue(String pre){

@@ -186,17 +186,25 @@ public class Text extends SOReflect implements Drawable, Selectable, Interactabl
 	@Override
 	public boolean key(char key) {
 		if((int)key == 8 && cursor > 0){// back space
+			String oldText = text;
 			text = text.substring(0,(int)cursor-1) + text.substring((int)cursor);
 			if(models != null){
 				DeleteCommand c = new DeleteCommand(root,models,text,cursor,this);
+				if(models.size() <= 0){
+					c.setPreviousValue(oldText);
+				}
 				root.doIt(c);
 			}
 			cursor--;
 		}
 		else{
+			String oldText = text;
 			text = text.substring(0,(int)cursor) + key + text.substring((int)cursor);
 			if(models != null){
 				InsertCommand c = new InsertCommand(root,models,text,cursor,this);
+				if(models.size() <= 0){
+					c.setPreviousValue(oldText);
+				}
 				root.doIt(c);
 			}
 			cursor++;

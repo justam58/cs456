@@ -50,7 +50,7 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 	
 	private double currentValue = -1;
 	
-	private double previousValue = -1;
+	private String previousValue;
 	
 	private void updateState(boolean clicked, boolean hovered){
 		for(int i = 0; i < listeners.size();i++){
@@ -202,7 +202,10 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 						dragging = true;
 						Point2D endp = new Point2D.Double();
 						myTransform.transform(new Point2D.Double(x,y), endp);
-						previousValue = Double.valueOf(root.getModelValue(models, root.model, 0));
+						previousValue = root.getModelValue(models, root.model, 0);
+						if(previousValue == null){
+							previousValue = String.valueOf(currentValue);
+						}
 					}
 					return true;
 				}
@@ -245,8 +248,11 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 			myTransform.transform(new Point2D.Double(x,y), endp);
 			double newModelValue = valueToModel(currentValue);
 			root.updateModel(models, root.model, 0, String.valueOf(newModelValue));
-			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue));
-			c.setPreviousValue(String.valueOf(previousValue));
+			SetCommand c = new SetCommand(root,models,String.valueOf(newModelValue),this);
+			if(models.size() <= 0){
+				c.setValueToSet(String.valueOf(currentValue));
+			}
+			c.setPreviousValue(previousValue);
 			root.doIt(c);
 			dragging = false;
 		}
@@ -263,15 +269,19 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 							if(newValue > max){
 								newValue = max;
 							}
-							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()));
+							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()),this);
 							root.doIt(c);
 							slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 						}
 						else{
+							double oldValue = currentValue;
 							currentValue += step;
 							if(currentValue > sliderMax){
 								currentValue = sliderMax;
 							}
+							SetCommand c = new SetCommand(root,models,String.valueOf(currentValue),this);
+							c.setPreviousValue(String.valueOf(oldValue));
+							root.doIt(c);
 							slider.moveTo(-1, currentValue, sliderMax, sliderMin);
 						}
 					}
@@ -282,15 +292,19 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 							if(newValue < min){
 								newValue = min;
 							}
-							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()));
+							SetCommand c = new SetCommand(root,models,String.valueOf(newValue.toString()),this);
 							root.doIt(c);
 							slider.moveTo(-1, valueFromModel(newValue), sliderMax, sliderMin);
 						}
 						else{
+							double oldValue = currentValue;
 							currentValue -= step;
 							if(currentValue < sliderMin){
 								currentValue = sliderMin;
 							}
+							SetCommand c = new SetCommand(root,models,String.valueOf(currentValue),this);
+							c.setPreviousValue(String.valueOf(oldValue));
+							root.doIt(c);
 							slider.moveTo(-1, currentValue, sliderMax, sliderMin);
 						}
 					}
@@ -308,7 +322,12 @@ public class ScrollV extends Group implements Interactable, Drawable, ModelListe
 		try{
 			double modelValue = Double.valueOf(newValue);
 			if(modelValue != slider.getCurrentY()){
-				slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+				if(models.size() > 0){
+					slider.moveTo(-1, valueFromModel(modelValue), sliderMax, sliderMin);
+				}
+				else{
+					slider.moveTo(-1, modelValue, sliderMax, sliderMin);
+				}
 			}
 		}
 		catch(NumberFormatException e){}
